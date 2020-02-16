@@ -1,4 +1,5 @@
 import XCTest
+import Foundation
 import Combine
 @testable import Balam
 
@@ -19,11 +20,10 @@ import Combine
     func testSave() {
         let expect = expectation(description: "")
         let graph = Graph(url)
-        graph.saved.sink(receiveCompletion: {
-            XCTAssertEqual(.finished, $0)
+        graph.saved.sink {
             XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
             expect.fulfill()
-        }) { _ in }.store(in: &subs)
+        }.store(in: &subs)
         graph.save()
         waitForExpectations(timeout: 1)
     }

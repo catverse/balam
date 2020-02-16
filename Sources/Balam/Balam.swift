@@ -17,9 +17,9 @@ import Combine
         }
         
         @available(OSX 10.15, *) public func receive<S>(subscriber: S) where S : Subscriber, Graph == S.Input {
-            sub = graph.saved.sink(receiveCompletion: { _ in
+            sub = graph.saved.sink {
                 _ = subscriber.receive(self.graph)
-            }) { _ in }
+            }
             graph.save()
         }
     }

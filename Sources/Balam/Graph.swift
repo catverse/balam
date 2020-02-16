@@ -2,8 +2,8 @@ import Foundation
 import Combine
 
 @available(OSX 10.15, *) public final class Graph {
-    public let saved: AnyPublisher<Never, Never>
-    private let saveSubject = PassthroughSubject<Never, Never>()
+    public let saved: AnyPublisher<Void, Never>
+    private let saveSubject = PassthroughSubject<Void, Never>()
     private let url: URL
     
     init(_ url: URL) {
@@ -15,7 +15,7 @@ import Combine
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
             try! Data().write(to: self.url, options: .atomic)
-            self.saveSubject.send(completion: .finished)
+            self.saveSubject.send()
         }
     }
 }
