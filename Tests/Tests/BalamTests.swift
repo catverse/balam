@@ -3,6 +3,5 @@ import XCTest
 
 final class BalamTests: XCTestCase {
     func testExample() {
-        XCTAssertEqual(Balam().text, "Hello, World!")
     }
 }

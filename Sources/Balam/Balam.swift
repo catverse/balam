@@ -1,3 +1,3 @@
-struct Balam {
-    var text = "Hello, World!"
+final class Balam {
+    
 }
