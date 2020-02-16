@@ -18,11 +18,10 @@ import Combine
     
     func testCreate() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink(receiveCompletion: {
-            XCTAssertEqual(.finished, $0)
+        Balam.graph(url).sink { _ in
             XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
             expect.fulfill()
-        }) { _ in }.store(in: &subs)
+        }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
 }

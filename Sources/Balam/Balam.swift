@@ -1,25 +1,26 @@
 import Foundation
 import Combine
 
-public final class Balam {
+@available(OSX 10.15, *) public final class Balam {
     public class func graph(_ url: URL) -> GraphPublisher {
         GraphPublisher(url)
     }
     
-    public struct GraphPublisher: Publisher {
+    public final class GraphPublisher: Publisher {
         public typealias Output = Graph
         public typealias Failure = Never
-        private let url: URL
+        private var sub: AnyCancellable?
+        private let graph: Graph
         
         fileprivate init(_ url: URL) {
-            self.url = url
+            graph = .init(url)
         }
         
-        @available(OSX 10.15, *) public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Graph == S.Input {
-            DispatchQueue.global(qos: .background).async {
-                try! Data().write(to: self.url, options: .atomic)
-                subscriber.receive(completion: .finished)
-            }
+        @available(OSX 10.15, *) public func receive<S>(subscriber: S) where S : Subscriber, Graph == S.Input {
+            sub = graph.saved.sink(receiveCompletion: { _ in
+                _ = subscriber.receive(self.graph)
+            }) { _ in }
+            graph.save()
         }
     }
 }
