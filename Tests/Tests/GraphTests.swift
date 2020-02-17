@@ -47,9 +47,28 @@ import Combine
         XCTAssertEqual("Lorem Ipsum", users?.first?.name)
         XCTAssertEqual(99, users?.first?.age)
     }
+    
+    func testUpdateNode() {
+        let graph = Graph(url)
+        graph._add(UserWithId())
+        var user = graph._nodes(UserWithId.self)!.first!
+        user.name = "hello world"
+        user.age = 456
+        graph._update(user)
+        let users = graph._nodes(UserWithId.self)
+        XCTAssertEqual(1, users?.count)
+        XCTAssertEqual("hello world", users?.first?.name)
+        XCTAssertEqual(456, users?.first?.age)
+    }
 }
 
 private struct User: Codable {
     var name = "Lorem Ipsum"
     var age = 99
+}
+
+private struct UserWithId: Codable, Identifiable {
+    var id = 0
+    var name = "Some anme"
+    var age = 123
 }
