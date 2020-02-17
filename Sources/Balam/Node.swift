@@ -5,7 +5,7 @@ struct Node: Codable, Hashable {
     let name: String
     let description: [String : Value]
     
-    init<T>(_ type: T) where T : Encodable {
+    init<T>(_ type: T) {
         self.name = String(describing: T.self)
         description = Mirror(reflecting: type).children.reduce(into: [:]) {
             guard let label = $1.label else { return }
@@ -19,8 +19,13 @@ struct Node: Codable, Hashable {
         }
     }
     
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
+    func hash(into: inout Hasher) {
+        into.combine(name)
+        into.combine(description)
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.name == rhs.name && lhs.description == rhs.description
     }
     
     enum Value: String, Codable {

@@ -38,8 +38,10 @@ import Combine
         graph._add(User())
         graph._add(last)
         XCTAssertEqual(1, graph.nodes.count)
-        XCTAssertEqual("User", graph.nodes.first?.name)
-        XCTAssertEqual(3, graph.nodes.first?.items.count)
+        graph.nodes.forEach {
+            XCTAssertEqual("User", $0.name)
+            XCTAssertEqual(3, $0.items.count)
+        }
     }
     
     func testAddAndRetrieveNode() {
@@ -63,6 +65,40 @@ import Combine
         XCTAssertEqual("hello world", users?.first?.name)
         XCTAssertEqual(456, users?.first?.age)
     }
+    
+    func testDifferentClassesSameName() {
+        let graph = Graph(url)
+        addClassv1(graph)
+        addClassv2(graph)
+        XCTAssertEqual(2, graph.nodes.count)
+        graph.nodes.forEach {
+            XCTAssertEqual("Model", $0.name)
+            XCTAssertEqual(1, $0.items.count)
+        }
+    }
+    
+    private func addClassv1(_ graph: Graph) {
+        struct Model: Codable {
+            let phone: Float
+            let number: Int
+        }
+        _ = graph._nodes(Model.self)
+        graph._add(Model(phone: 12.3, number: 4543))
+        let models = graph._nodes(Model.self)
+        XCTAssertEqual(1, models?.count)
+    }
+    
+    private func addClassv2(_ graph: Graph) {
+        struct Model: Codable {
+            let a: String
+            let b: String
+            let c: String
+        }
+        _ = graph._nodes(Model.self)
+        graph._add(Model(a: "as", b: "bs", c: "cs"))
+        let models = graph._nodes(Model.self)
+        XCTAssertEqual(1, models?.count)
+    }
 }
 
 private struct User: Codable {
@@ -72,6 +108,6 @@ private struct User: Codable {
 
 private struct UserWithId: Codable, Identifiable {
     var id = 0
-    var name = "Some anme"
+    var name = "Some name"
     var age = 123
 }
