@@ -4,10 +4,8 @@ import Combine
 
 @available(OSX 10.15, *) final class GraphTests: XCTestCase {
     private var url: URL!
-    private var subs: Set<AnyCancellable>!
     
     override func setUp() {
-        subs = .init()
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
         try? FileManager.default.removeItem(at: url)
     }
@@ -21,8 +19,6 @@ import Combine
         graph._add(User())
         XCTAssertEqual(1, graph.nodes.count)
         XCTAssertEqual("User", graph.nodes.first?.name)
-        XCTAssertEqual(.string, graph.nodes.first?.description["name"])
-        XCTAssertEqual(.int, graph.nodes.first?.description["age"])
         XCTAssertEqual(1, graph.nodes.first?.items.count)
     }
     
