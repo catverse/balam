@@ -14,9 +14,13 @@ import Combine
         queue.async { [weak self] in self?._add(node) }
     }
     
-    public func get<T>(_ nodes: T.Type) -> GetPublisher<T> where T : Decodable {
-        let publisher = GetPublisher<T>()
-        return publisher
+    public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Decodable {
+        .init { [weak self] promise in
+            self?.queue.async {
+                guard let nodes = self?._nodes(type) else { return }
+                promise(.success(nodes))
+            }
+        }
     }
     
     func _add<T>(_ node: T) where T : Encodable {
@@ -26,28 +30,11 @@ import Combine
         nodes.insert(container)
     }
     
+    func _nodes<T>(_ type: T.Type) -> [T] where T : Decodable {
+        []
+    }
+    
     func save() {
         try! Data().write(to: url, options: .atomic)
-    }
-    
-    public final class GetPublisher<T>: Publisher {
-        public typealias Output = [T]
-        public typealias Failure = Never
-        
-        @available(OSX 10.15, *) public func receive<S>(subscriber: S) where S : Subscriber, [T] == S.Input {
-            subscriber.receive(subscription: GetSubscription())
-        }
-    }
-    
-    final class GetSubscription: Subscription {
-        func request(_ demand: Subscribers.Demand) {
-            
-        }
-        
-        func cancel() {
-            
-        }
-        
-        
     }
 }
