@@ -22,6 +22,8 @@ import Combine
             XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
             expect.fulfill()
         }.store(in: &subs)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 1) { _ in
+            self.subs.forEach { $0.cancel() }
+        }
     }
 }
