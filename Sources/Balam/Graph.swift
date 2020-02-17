@@ -8,6 +8,7 @@ import Combine
     
     init(_ url: URL) {
         self.url = url
+        save()
     }
     
     public func add<T>(_ node: T) where T : Encodable {
@@ -17,8 +18,7 @@ import Combine
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Decodable {
         .init { [weak self] promise in
             self?.queue.async {
-                guard let nodes = self?._nodes(type) else { return }
-                promise(.success(nodes))
+                promise(.success(self?._nodes(type) ?? []))
             }
         }
     }
@@ -30,8 +30,8 @@ import Combine
         nodes.insert(container)
     }
     
-    func _nodes<T>(_ type: T.Type) -> [T] where T : Decodable {
-        []
+    func _nodes<T>(_ type: T.Type) -> [T]? where T : Decodable {
+        nodes.first { $0.name == .init(describing: type) }?.items.compactMap { try? JSONDecoder().decode(type, from: $0) }
     }
     
     func save() {

@@ -43,9 +43,9 @@ import Combine
         let graph = Graph(url)
         graph._add(User())
         let users = graph._nodes(User.self)
-        XCTAssertEqual(1, users.count)
-        XCTAssertEqual("Lorem Ipsum", users.first?.name)
-        XCTAssertEqual(99, users.first?.age)
+        XCTAssertEqual(1, users?.count)
+        XCTAssertEqual("Lorem Ipsum", users?.first?.name)
+        XCTAssertEqual(99, users?.first?.age)
     }
 }
 
