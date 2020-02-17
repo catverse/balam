@@ -26,15 +26,15 @@ import Combine
     func _add<T>(_ node: T) where T : Encodable {
         var container = nodes.first { $0.name == .init(describing: type(of: node)) } ?? Node(node)
         nodes.remove(container)
-        try! container.items.append(JSONEncoder().encode(node))
+        try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = nodes.first { $0.name == .init(describing: type(of: node)) } ?? Node(node)
         nodes.remove(container)
-        container.items.removeAll { try! JSONDecoder().decode(T.self, from: $0).id == node.id }
-        try! container.items.append(JSONEncoder().encode(node))
+        container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
+        try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
     }
     

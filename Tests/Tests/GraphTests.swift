@@ -28,10 +28,13 @@ import Combine
     
     func testAddThreeNodes() {
         let graph = Graph(url)
+        var first = User()
+        first.name = "some name"
+        first.age = 22
         var last = User()
         last.name = "Ipsum Lorem"
         last.age = 33
-        graph._add(User())
+        graph._add(first)
         graph._add(User())
         graph._add(last)
         XCTAssertEqual(1, graph.nodes.count)

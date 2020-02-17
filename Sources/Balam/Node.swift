@@ -1,7 +1,7 @@
 import Foundation
 
 struct Node: Codable, Hashable {
-    var items = [Data]()
+    var items = Set<Data>()
     let name: String
     let description: [String : Value]
     
