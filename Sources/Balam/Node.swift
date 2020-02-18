@@ -4,6 +4,7 @@ struct Node: Codable, Hashable {
     var items = Set<Data>()
     let name: String
     let description: [String : Value]
+    let properties: Set<Property>
     
     init<T>(_ type: T) {
         self.name = String(describing: T.self)
