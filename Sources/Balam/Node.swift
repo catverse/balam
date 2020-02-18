@@ -30,14 +30,5 @@ struct Node: Codable, Hashable {
         lhs.name == rhs.name && lhs.description == rhs.description
     }
     
-    enum Value: String, Codable {
-        case
-        string,
-        int,
-        double,
-        optionalString,
-        optionalInt,
-        optionalDouble,
-        null
-    }
+    
 }
