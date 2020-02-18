@@ -4,7 +4,7 @@ import Combine
 @available(OSX 10.15, *) public final class Graph {
     private(set) var nodes = Set<Node>()
     private let url: URL
-    private let queue = DispatchQueue(label: "", qos: .background, target: .global(qos: .background))
+    private let queue = DispatchQueue(label: "", qos: .utility)
     
     init(_ url: URL) {
         self.url = url
@@ -20,6 +20,12 @@ import Combine
             self?.queue.async {
                 promise(.success(self?._nodes(type) ?? []))
             }
+        }
+    }
+    
+    public func update<T>(_ node: T) where T : Codable {
+        queue.async { [weak self] in
+            self?.update(node)
         }
     }
     
