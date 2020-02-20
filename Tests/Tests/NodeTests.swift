@@ -6,12 +6,12 @@ import Combine
     func testAddNode() {
         let node = Node(Model())
         XCTAssertEqual("Model", node.name)
-        XCTAssertEqual(.string, node.description["name"])
-        XCTAssertEqual(.int, node.description["age"])
-        XCTAssertEqual(.double, node.description["phone"])
-        XCTAssertEqual(.optionalString, node.description["opString"])
-        XCTAssertEqual(.optionalString, node.description["opNilString"])
-        XCTAssertEqual(.optionalInt, node.description["opNilInt"])
+//        XCTAssertEqual(.string, node.description["name"])
+//        XCTAssertEqual(.int, node.description["age"])
+//        XCTAssertEqual(.double, node.description["phone"])
+//        XCTAssertEqual(.optionalString, node.description["opString"])
+//        XCTAssertEqual(.optionalString, node.description["opNilString"])
+//        XCTAssertEqual(.optionalInt, node.description["opNilInt"])
     }
 }
 

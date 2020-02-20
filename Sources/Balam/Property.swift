@@ -1,5 +1,42 @@
 import Foundation
 
+class Property: Codable, Hashable {
+    let name: String
+    
+    init(_ name: String) {
+        self.name = name
+    }
+    
+    func hash(into: inout Hasher) {
+        into.combine(name)
+    }
+    
+    static func == (lhs: Property, rhs: Property) -> Bool {
+        type(of: lhs) == type(of: rhs) &&
+        lhs.name == rhs.name
+    }
+}
+
+class StringProperty: Property {
+    static func == (lhs: StringProperty, rhs: StringProperty) -> Bool {
+        lhs.name == rhs.name
+    }
+}
+
+class IntProperty: Property {
+    static func == (lhs: IntProperty, rhs: IntProperty) -> Bool {
+        lhs.name == rhs.name
+    }
+}
+
+protocol OptionalProperty {
+    
+}
+
+protocol NoNullProperty {
+    
+}
+/*
 final class Property: Codable, Hashable {
     var dictionary: Dict?
     var group = Group.one
@@ -46,3 +83,4 @@ final class Property: Codable, Hashable {
             && lhs.dictionary == rhs.dictionary
     }
 }
+*/
