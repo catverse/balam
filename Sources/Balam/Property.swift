@@ -107,4 +107,14 @@ public class Property: Codable, Hashable {
             value
         }
     }
+    
+    public final class Unknown: Property {
+        override func equals(_ property: Property) -> Bool {
+            false
+        }
+        
+        public override func hash(into: inout Hasher) {
+            
+        }
+    }
 }

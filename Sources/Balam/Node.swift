@@ -8,17 +8,18 @@ struct Node: Codable, Hashable {
     init<T>(_ type: T) {
         self.name = String(describing: T.self)
         properties = Mirror(reflecting: type).children.reduce(into: .init()) {
-            guard let label = $1.label else { return }
-            let display = Mirror(reflecting: $1.value).displayStyle
+            var property: Property
             switch $1.value {
-            case is String: $0.insert(display == .optional ? .Optional(.String(label)) : .String(label))
-            case is Int: $0.insert(display == .optional ? .Optional(.Int(label)) : .Int(label))
-//            case is Int: $0[label] = .int
-//            case is Double: $0[label] = .double
-//            case let a where (a as? String) == Optional<String>.none: $0[label] = .optionalString
-//            case let a where (a as? Int) == Optional<Int>.none: $0[label] = .optionalInt
-            default: break
+            case is String: property = .String($1.label!)
+            case is Int: property = .Int($1.label!)
+            case is Double: property = .Double($1.label!)
+            case is [String?]: property = .Array(.Optional(.String($1.label!)))
+            case is [String]: property = .Array(.String($1.label!))
+            default: property = .Unknown()
             }
+            print($1.value is [String])
+            print($1.value is [String?])
+            $0.insert(Mirror(reflecting: $1.value).displayStyle == .optional ? .Optional(property) : property)
         }
     }
     
