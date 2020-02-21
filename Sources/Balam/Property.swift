@@ -1,41 +1,56 @@
 import Foundation
 
-class Property: Codable, Hashable {
-    let name: String
-    
-    init(_ name: String) {
-        self.name = name
+public class Property: Codable, Hashable {
+    public func hash(into: inout Hasher) {
+//        into.combine(name)
     }
     
-    func hash(into: inout Hasher) {
-        into.combine(name)
+    public static func == (lhs: Property, rhs: Property) -> Bool {
+        type(of: lhs) == type(of: rhs)
+//        lhs.name == rhs.name
     }
     
-    static func == (lhs: Property, rhs: Property) -> Bool {
-        type(of: lhs) == type(of: rhs) &&
-        lhs.name == rhs.name
+    public class Concrete: Property {
+        public let name: Swift.String
+        
+        init(_ name: Swift.String) {
+            self.name = name
+            super.init()
+        }
+        
+        required init(from: Decoder) throws {
+            try name = from.container(keyedBy: Key.self).decode(Swift.String.self, forKey: .name)
+            try super.init(from: from)
+        }
+        
+        private enum Key: CodingKey {
+            case name
+        }
+    }
+    
+    public final class Optional: Property {
+        init(_ property: Property) {
+            super.init()
+        }
+        
+        required init(from: Decoder) throws {
+            try super.init(from: from)
+        }
+    }
+    
+    public final class String: Concrete { }
+    public final class Int: Concrete { }
+
+    
+    
+    public final class Array: Property {
+    }
+    
+    public final class Set: Property {
+        
     }
 }
 
-class StringProperty: Property {
-    static func == (lhs: StringProperty, rhs: StringProperty) -> Bool {
-        lhs.name == rhs.name
-    }
-}
-
-class IntProperty: Property {
-    static func == (lhs: IntProperty, rhs: IntProperty) -> Bool {
-        lhs.name == rhs.name
-    }
-}
-
-protocol OptionalProperty {
-    
-}
-
-protocol NoNullProperty {
-    
-}
 /*
 final class Property: Codable, Hashable {
     var dictionary: Dict?
