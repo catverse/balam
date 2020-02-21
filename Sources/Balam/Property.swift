@@ -1,13 +1,16 @@
 import Foundation
 
 public class Property: Codable, Hashable {
+    private func equals(_ property: Property) -> Bool {
+        type(of: self) == type(of: property)
+    }
+    
     public func hash(into: inout Hasher) {
 //        into.combine(name)
     }
     
     public static func == (lhs: Property, rhs: Property) -> Bool {
-        type(of: lhs) == type(of: rhs)
-//        lhs.name == rhs.name
+        lhs.equals(rhs)
     }
     
     public class Concrete: Property {
@@ -23,32 +26,40 @@ public class Property: Codable, Hashable {
             try super.init(from: from)
         }
         
+        override func equals(_ property: Property) -> Bool {
+            super.equals(property) && name == (property as! Concrete).name
+        }
+        
         private enum Key: CodingKey {
             case name
         }
     }
     
-    public final class Optional: Property {
+    public class Wrap: Property {
+        public let property: Property
+        
         init(_ property: Property) {
+            self.property = property
             super.init()
         }
         
         required init(from: Decoder) throws {
+            try property = from.container(keyedBy: Key.self).decode(Property.self, forKey: .property)
             try super.init(from: from)
+        }
+        
+        override func equals(_ property: Property) -> Bool {
+            super.equals(property) && self.property == (property as! Wrap).property
+        }
+        
+        private enum Key: CodingKey {
+            case property
         }
     }
     
+    public final class Optional: Wrap { }
     public final class String: Concrete { }
     public final class Int: Concrete { }
-
-    
-    
-    public final class Array: Property {
-    }
-    
-    public final class Set: Property {
-        
-    }
 }
 
 /*

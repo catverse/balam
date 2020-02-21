@@ -9,5 +9,6 @@ final class PropertyTests: XCTestCase {
         XCTAssertNotEqual(Property.String("a"), Property.Int("a"))
         XCTAssertEqual(Property.Optional(Property.String("a")), Property.Optional(Property.String("a")))
         XCTAssertNotEqual(Property.Optional(Property.String("a")), Property.String("a"))
+        XCTAssertNotEqual(Property.Optional(Property.String("a")), Property.Optional(Property.String("b")))
     }
 }
