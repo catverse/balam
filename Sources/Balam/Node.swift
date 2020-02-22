@@ -7,20 +7,7 @@ struct Node: Codable, Hashable {
     
     init<T>(_ type: T) {
         self.name = String(describing: T.self)
-        properties = Mirror(reflecting: type).children.reduce(into: .init()) {
-            var property: Property
-            switch $1.value {
-            case is String: property = .String($1.label!)
-            case is Int: property = .Int($1.label!)
-            case is Double: property = .Double($1.label!)
-            case is [String?]: property = .Array(.Optional(.String($1.label!)))
-            case is [String]: property = .Array(.String($1.label!))
-            default: property = .Unknown()
-            }
-            print($1.value is [String])
-            print($1.value is [String?])
-            $0.insert(Mirror(reflecting: $1.value).displayStyle == .optional ? .Optional(property) : property)
-        }
+        properties = Mirror(reflecting: type).reflect
     }
     
     func hash(into: inout Hasher) {

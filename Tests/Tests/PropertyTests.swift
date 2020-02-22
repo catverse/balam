@@ -18,8 +18,8 @@ final class PropertyTests: XCTestCase {
         XCTAssertNotEqual(.Array(.Optional(.String("a"))), Property.Optional(.Array(.String("a"))))
         XCTAssertEqual(.Dictionary("a", key: .String(""), value: .Int("")), Property.Dictionary("a", key: .String(""), value: .Int("")))
         XCTAssertNotEqual(.Dictionary("a", key: .String(""), value: .Int("")), Property.Dictionary("b", key: .String(""), value: .Int("")))
-        XCTAssertNotEqual(.Unknown(), Property.Unknown())
-        XCTAssertNotEqual(.String("a"), Property.Unknown())
+        XCTAssertEqual(.Custom("a"), Property.Custom("a"))
+        XCTAssertNotEqual(.Custom("a"), Property.Custom("b"))
     }
     
     func testHashable() {
@@ -28,6 +28,6 @@ final class PropertyTests: XCTestCase {
         XCTAssertEqual(2, Set<Property>([.String("a"), .String("b")]).count)
         XCTAssertEqual(2, Set<Property>([.String("a"), .Optional(.String("a"))]).count)
         XCTAssertEqual(1, Set<Property>([.Optional(.String("a")), .Optional(.String("a"))]).count)
-        XCTAssertEqual(2, Set<Property>([.Unknown(), .Unknown()]).count)
+        XCTAssertEqual(1, Set<Property>([.Custom("a"), .Custom("a")]).count)
     }
 }

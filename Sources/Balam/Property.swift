@@ -67,6 +67,7 @@ public class Property: Codable, Hashable {
         }
     }
     
+    public final class Custom: Concrete { }
     public final class Optional: Wrap { }
     public final class Array: Wrap { }
     public final class Set: Wrap { }
@@ -105,16 +106,6 @@ public class Property: Codable, Hashable {
             case
             key,
             value
-        }
-    }
-    
-    public final class Unknown: Property {
-        override func equals(_ property: Property) -> Bool {
-            false
-        }
-        
-        public override func hash(into: inout Hasher) {
-            
         }
     }
 }

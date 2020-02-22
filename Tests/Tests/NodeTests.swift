@@ -24,12 +24,12 @@ import Combine
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.String)?.name == "opString" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Int)?.name == "opInt" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { ($0.property as? Property.String)?.name == "arrString" })
-        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { (($0.property as? Property.Optional)?.property as? Property.String)?.name == "arrStringOptional" })
+        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { ($0.property as? Property.String)?.name == "arrStringOptional" })
     }
     
     func testArray() {
         struct Model {
-            let arr = [String?]()
+            let arr = [String]()
         }
         
         let node = Node(Model())
