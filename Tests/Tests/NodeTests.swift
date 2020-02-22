@@ -29,10 +29,10 @@ import Combine
     
     func testArray() {
         struct Model {
-            let arr = [String]()
+            let arr: String? = nil
         }
         
         let node = Node(Model())
-        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { ($0.property as? Property.String)?.name == "arr" })
+        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.String)?.name == "arr" })
     }
 }
