@@ -22,7 +22,7 @@ extension Mirror {
     }
     
     private func wrapped(_ name: String, value: Any) -> Property {
-        value is [Any] ? .Array(child(name, value: (value as! [Any]).first!)) : child(name, value: value)
+        value is [Any] ? .Array((value as! [Any]).first.map { child(name, value: $0) } ?? .Custom(name)) : child(name, value: value)
     }
     
     private func child(_ name: String, value: Any) -> Property {
@@ -31,6 +31,17 @@ extension Mirror {
         case is Int: return .Int(name)
         case is Double: return .Double(name)
         case is Bool: return .Boolean(name)
+        case is Float: return .Float(name)
+        case is Data: return .Data(name)
+        case is Date: return .Date(name)
+        case is UInt8: return .UInt8(name)
+        case is UInt16: return .UInt16(name)
+        case is UInt32: return .UInt32(name)
+        case is UInt64: return .UInt64(name)
+        case is Int8: return .Int8(name)
+        case is Int16: return .Int16(name)
+        case is Int32: return .Int32(name)
+        case is Int64: return .Int64(name)
         default: return .Custom(name)
         }
     }
