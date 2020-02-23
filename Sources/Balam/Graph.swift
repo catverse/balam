@@ -11,11 +11,11 @@ import Combine
         save()
     }
     
-    public func add<T>(_ node: T) where T : Encodable {
+    public func add<T>(_ node: T) where T : Codable {
         queue.async { [weak self] in self?._add(node) }
     }
     
-    public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Decodable {
+    public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { [weak self] promise in
             self?.queue.async {
                 promise(.success(self?._nodes(type) ?? []))
@@ -29,7 +29,7 @@ import Combine
         }
     }
     
-    func _add<T>(_ node: T) where T : Encodable {
+    func _add<T>(_ node: T) where T : Codable {
         var container = nodeFor(.init(node))
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
@@ -42,7 +42,7 @@ import Combine
         nodes.insert(container)
     }
     
-    func _nodes<T>(_ type: T.Type) -> [T]? where T : Decodable {
+    func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
         nodes.filter { $0.name == .init(describing: type) }.first {
             guard
                 let item = $0.items.first,

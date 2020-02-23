@@ -5,8 +5,8 @@ struct Node: Codable, Hashable {
     let name: String
     let properties: Set<Property>
     
-    init<T>(_ type: T) {
-        self.name = String(describing: T.self)
+    init<T>(_ type: T) where T : Codable {
+        self.name = .init(describing: T.self)
         properties = Mirror(reflecting: type).reflect
     }
     

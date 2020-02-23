@@ -1,19 +1,22 @@
 import Foundation
 
 extension Mirror {
-    var reflect: Set<Property> {
+    func reflect<T>(_ object: T) -> Set<Property> where T : Codable {
         children.reduce(into: .init()) {
-            $0.insert(property($1))
+            $0.insert(isNil($1.1)
+                ? guess($1.0!, object: object)
+                : {
+                    $1 == .optional ? .Optional($0) : $0
+                } (child($1.0!, value: $1.1), Mirror(reflecting: $1.1).displayStyle))
         }
     }
     
-    private func property(_ child: (String?, Any)) -> Property {
-        isNil(child.1) ? guess(child.0!, value: child.1) : {
-            Mirror(reflecting: child.1).displayStyle == .optional ? .Optional($0) : $0
-        } (found(child.0!, value: child.1))
+    private func guess<T>(_ property: String, object: T) -> Property where T : Codable {
+        var a: String? = cast(value)
+        return .Custom(property)
     }
     
-    private func found(_ name: String, value: Any) -> Property {
+    private func child(_ name: String, value: Any) -> Property {
         switch value {
         case is String: return .String(name)
         case is Int: return .Int(name)
@@ -21,11 +24,6 @@ extension Mirror {
         case is [String]: return .Array(.String(name))
         default: return .Custom(name)
         }
-    }
-    
-    private func guess(_ name: String, value: Any) -> Property {
-        var a: String? = cast(value)
-        return .Custom(name)
     }
     
     private func isNil(_ value: Any) -> Bool {
