@@ -75,6 +75,7 @@ public class Property: Codable, Hashable {
     public final class Int: Concrete { }
     public final class Double: Concrete { }
     public final class Float: Concrete { }
+    public final class Boolean: Concrete { }
     
     public final class Dictionary: Concrete {
         public let key: Property

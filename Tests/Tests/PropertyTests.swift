@@ -30,15 +30,4 @@ final class PropertyTests: XCTestCase {
         XCTAssertEqual(1, Set<Property>([.Optional(.String("a")), .Optional(.String("a"))]).count)
         XCTAssertEqual(1, Set<Property>([.Custom("a"), .Custom("a")]).count)
     }
-    
-    func testGuess() {
-        struct Model: Codable {
-            var b = "c"
-            var a: Int? = nil
-        }
-        var model = try! JSONSerialization.jsonObject(with: JSONEncoder().encode(Model())) as! [String : Any]
-        model["a"] = ""
-        let decoded = try! JSONDecoder().decode(Model.self, from: JSONSerialization.data(withJSONObject: model))
-        print(decoded.a)
-    }
 }

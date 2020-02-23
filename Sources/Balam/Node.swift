@@ -7,7 +7,7 @@ struct Node: Codable, Hashable {
     
     init<T>(_ type: T) where T : Codable {
         self.name = .init(describing: T.self)
-        properties = Mirror(reflecting: type).reflect
+        properties = Mirror(reflecting: type).reflect(type)
     }
     
     func hash(into: inout Hasher) {
