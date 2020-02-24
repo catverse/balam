@@ -12,17 +12,15 @@ extension Mirror {
     }
     
     private func guess<T>(_ property: String, object: T) -> Property where T : Codable {
-        ["", 0, false, [""], [0], [false]].compactMap {
-            var json = try! JSONSerialization.jsonObject(with: JSONEncoder().encode(object)) as! [String : Any]
-            json[property] = $0
-            return (try? JSONDecoder().decode(T.self, from: JSONSerialization.data(withJSONObject: json))).map {
-                Mirror(reflecting: $0).children.first { $0.label == property }!.value
+        ["", 0, false].flatMap {
+            [$0, [$0], [[$0]], [[[$0]]], [[[[$0]]]]].compactMap {
+                inject($0, property: property, object: object)
             }
         }.first.map { wrapped(property, value: $0) } ?? .Custom(property)
     }
     
     private func wrapped(_ name: String, value: Any) -> Property {
-        value is [Any] ? .Array((value as! [Any]).first.map { child(name, value: $0) } ?? .Custom(name)) : child(name, value: value)
+        value is [Any] ? .Array((value as! [Any]).first.map { wrapped(name, value: $0) } ?? .Custom(name)) : child(name, value: value)
     }
     
     private func child(_ name: String, value: Any) -> Property {
@@ -43,6 +41,14 @@ extension Mirror {
         case is Int32: return .Int32(name)
         case is Int64: return .Int64(name)
         default: return .Custom(name)
+        }
+    }
+    
+    private func inject<T>(_ meta: Any, property: String, object: T) -> Any? where T : Codable {
+        var json = try! JSONSerialization.jsonObject(with: JSONEncoder().encode(object)) as! [String : Any]
+        json[property] = meta
+        return (try? JSONDecoder().decode(T.self, from: JSONSerialization.data(withJSONObject: json))).map {
+            Mirror(reflecting: $0).children.first { $0.label == property }!.value
         }
     }
     

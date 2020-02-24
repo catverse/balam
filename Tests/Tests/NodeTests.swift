@@ -18,6 +18,7 @@ import Combine
             var date = Date()
             var data = Data()
             var arrString = [String]()
+            var arrArrString = [[String]]()
             var arrStringOptional = [String?]()
             var opString: String? = "opt"
             var opInt: Int? = 9
@@ -79,5 +80,6 @@ import Combine
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Double)?.name == "timeIntervalNil" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Date)?.name == "dateNil" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Data)?.name == "dataNil" })
+        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { (($0.property as? Property.Array)?.property as? Property.String)?.name == "arrArrString" })
     }
 }
