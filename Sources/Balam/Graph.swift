@@ -8,7 +8,6 @@ import Combine
     
     init(_ url: URL) {
         self.url = url
-        save()
     }
     
     public func add<T>(_ node: T) where T : Codable {
@@ -29,14 +28,23 @@ import Combine
         }
     }
     
+    func load() -> Future<Void, Never> {
+        .init { [weak self] promise in
+            self?.queue.async {
+                self?._load()
+                promise(.success())
+            }
+        }
+    }
+    
     func _add<T>(_ node: T) where T : Codable {
-        var container = nodeFor(.init(node))
+        var container = find(.init(node))
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
-        var container = nodeFor(.init(node))
+        var container = find(.init(node))
         container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
@@ -52,11 +60,22 @@ import Combine
         }?.items.map { try! JSONDecoder().decode(type, from: $0) }
     }
     
-    func save() {
-        try! Data().write(to: url, options: .atomic)
+    private func _load() {
+        guard
+            FileManager.default.fileExists(atPath: url.path),
+            let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
+        else {
+            save()
+            return
+        }
+        self.nodes = nodes
     }
     
-    private func nodeFor(_ node: Node) -> Node {
+    private func save() {
+        try! (JSONEncoder().encode(nodes) as NSData).compressed(using: .lzfse).write(to: url, options: .atomic)
+    }
+    
+    private func find(_ node: Node) -> Node {
         nodes.remove(node) ?? node
     }
 }
