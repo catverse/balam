@@ -32,7 +32,7 @@ import Combine
         .init { [weak self] promise in
             self?.queue.async {
                 self?._load()
-                promise(.success())
+                promise(.success(()))
             }
         }
     }
