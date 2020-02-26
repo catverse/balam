@@ -4,10 +4,19 @@ import Combine
 @available(OSX 10.15, *) public final class Graph {
     private(set) var nodes = Set<Node>()
     private let url: URL
-    private let queue = DispatchQueue(label: "", qos: .utility)
+    private let queue: DispatchQueue
     
-    init(_ url: URL) {
+    init(_ url: URL, queue: DispatchQueue) {
         self.url = url
+        self.queue = queue
+        guard
+            FileManager.default.fileExists(atPath: url.path),
+            let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
+        else {
+            save()
+            return
+        }
+        self.nodes = nodes
     }
     
     public func add<T>(_ node: T) where T : Codable {
@@ -28,19 +37,11 @@ import Combine
         }
     }
     
-    func load() -> Future<Void, Never> {
-        .init { [weak self] promise in
-            self?.queue.async {
-                self?._load()
-                promise(.success(()))
-            }
-        }
-    }
-    
     func _add<T>(_ node: T) where T : Codable {
         var container = find(.init(node))
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
+        save()
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
@@ -48,6 +49,7 @@ import Combine
         container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
+        save()
     }
     
     func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
@@ -58,17 +60,6 @@ import Combine
             else { return false }
             return $0 == Node(decoded)
         }?.items.map { try! JSONDecoder().decode(type, from: $0) }
-    }
-    
-    private func _load() {
-        guard
-            FileManager.default.fileExists(atPath: url.path),
-            let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
-        else {
-            save()
-            return
-        }
-        self.nodes = nodes
     }
     
     private func save() {

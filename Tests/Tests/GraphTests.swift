@@ -15,15 +15,17 @@ import Combine
     }
     
     func testAddNode() {
-        let graph = Graph(url)
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
         graph._add(User())
         XCTAssertEqual(1, graph.nodes.count)
         XCTAssertEqual("User", graph.nodes.first?.name)
         XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
     func testAddThreeNodes() {
-        let graph = Graph(url)
+        let graph = Graph(url, queue: .main)
         var first = User()
         first.name = "some name"
         first.age = 22
@@ -41,7 +43,7 @@ import Combine
     }
     
     func testAddAndRetrieveNode() {
-        let graph = Graph(url)
+        let graph = Graph(url, queue: .main)
         graph._add(User())
         let users = graph._nodes(User.self)
         XCTAssertEqual(1, users?.count)
@@ -50,7 +52,8 @@ import Combine
     }
     
     func testUpdateNode() {
-        let graph = Graph(url)
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
         graph._add(UserWithId())
         var user = graph._nodes(UserWithId.self)!.first!
         user.name = "hello world"
@@ -60,10 +63,11 @@ import Combine
         XCTAssertEqual(1, users?.count)
         XCTAssertEqual("hello world", users?.first?.name)
         XCTAssertEqual(456, users?.first?.age)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
     func testDifferentClassesSameName() {
-        let graph = Graph(url)
+        let graph = Graph(url, queue: .main)
         addClassv1(graph)
         addClassv2(graph)
         XCTAssertEqual(2, graph.nodes.count)

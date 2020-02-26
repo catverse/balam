@@ -16,6 +16,8 @@ struct Node: Codable, Hashable {
     }
     
     static func == (lhs: Node, rhs: Node) -> Bool {
-        lhs.name == rhs.name && lhs.properties == rhs.properties
+        print("is \(lhs.name == rhs.name && lhs.properties == rhs.properties)")
+        print(type(of: lhs.properties.first))
+        return lhs.name == rhs.name && lhs.properties == rhs.properties
     }
 }
