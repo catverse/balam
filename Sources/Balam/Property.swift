@@ -108,22 +108,8 @@ public class Property: Codable, Hashable {
         }
     }
     
-    private init() { }
-    
-    public required init(from: Decoder) throws {
-        let type = try from.container(keyedBy: Keys.self).decode(String.self, forKey: .type)
-        switch type {
-        case "Property.String":
-        }
-    }
-    
     public func hash(into: inout Hasher) {
         into.combine(Swift.String(describing: type(of: self)))
-    }
-    
-    public func encode(to: Encoder) throws {
-        var container = to.container(keyedBy: Keys.self)
-        try container.encode(Swift.String(describing: self), forKey: .type)
     }
     
     private func equals(_ property: Property) -> Bool {
@@ -132,9 +118,5 @@ public class Property: Codable, Hashable {
     
     public static func == (lhs: Property, rhs: Property) -> Bool {
         lhs.equals(rhs)
-    }
-    
-    private enum Keys: CodingKey {
-        case type
     }
 }
