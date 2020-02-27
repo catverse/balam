@@ -30,4 +30,9 @@ final class PropertyTests: XCTestCase {
         XCTAssertEqual(1, Set<Property>([.Optional(.String("a")), .Optional(.String("a"))]).count)
         XCTAssertEqual(1, Set<Property>([.Custom("a"), .Custom("a")]).count)
     }
+    
+    func testCoding() {
+        let property = Property.String("a")
+        XCTAssertEqual(property, try! JSONDecoder().decode(Property.self, from: JSONEncoder().encode(property)) as? Property.String)
+    }
 }
