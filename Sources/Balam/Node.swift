@@ -15,11 +15,8 @@ struct Node: Codable, Hashable {
         items = try values.decode(Set<Data>.self, forKey: .items)
         name = try values.decode(String.self, forKey: .name)
         properties = try values.decode([Kind].self, forKey: .properties).reduce(into: .init()) {
-            $0.insert(decoded(Bundle.main.classNamed($1.type)!, data: $1.property))
+            $0.insert($1.property)
         }
-        
-        let additionalInfo = try values.nestedContainer(keyedBy: AdditionalInfoKeys.self, forKey: .additionalInfo)
-        elevation = try additionalInfo.decode(Double.self, forKey: .elevation)
     }
     
     func encode(to: Encoder) throws {
@@ -34,7 +31,7 @@ struct Node: Codable, Hashable {
         into.combine(properties)
     }
     
-    private func decoded<T>(_ name: T, data: Data) -> T where T : Decodable {
+    private func decoded<T>(_ name: T.Type, data: Data) -> T where T : Property {
         try! JSONDecoder().decode(T.self, from: data)
     }
     
@@ -51,11 +48,26 @@ struct Node: Codable, Hashable {
     
     private struct Kind: Codable {
         let type: String
-        let property: Data
+        let property: Property
         
         init(_ property: Property) {
             type = .init(describing: property)
-            self.property = try! JSONEncoder().encode(property)
+            self.property = property
+        }
+        
+        init(from: Decoder) throws {
+            let values = try from.container(keyedBy: Key.self)
+            type = try values.decode(String.self, forKey: .type)
+            switch type {
+            case "Balam.Property.String": property = try values.decode(Property.String.self, forKey: .property)
+            default: property = try values.decode(Property.self, forKey: .property)
+            }
+        }
+        
+        private enum Key: CodingKey {
+            case
+            type,
+            property
         }
     }
 }
