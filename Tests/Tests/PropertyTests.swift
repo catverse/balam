@@ -85,4 +85,13 @@ final class PropertyTests: XCTestCase {
         let node = Node(Model())
         XCTAssertEqual(Property.Dictionary("a", key: .String(""), value: .Int("")), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
+    
+    func testDictionaryWithArray() {
+        struct Model: Codable {
+            var a = ["hello" : ["lorem", "ipsum"]]
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Dictionary("a", key: .String(""), value: .Array(.String(""))), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
 }
