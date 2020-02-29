@@ -67,6 +67,12 @@ public class Property: Codable, Hashable {
             try super.init(from: from)
         }
         
+        public override func encode(to: Encoder) throws {
+            try super.encode(to: to)
+            var container = to.container(keyedBy: Key.self)
+            try container.encode(name, forKey: .name)
+        }
+        
         public override func hash(into: inout Hasher) {
             super.hash(into: &into)
             into.combine(name)
@@ -92,6 +98,12 @@ public class Property: Codable, Hashable {
         required init(from: Decoder) throws {
             try property = from.container(keyedBy: Key.self).decode(Property.self, forKey: .property)
             try super.init(from: from)
+        }
+        
+        public override func encode(to: Encoder) throws {
+            try super.encode(to: to)
+            var container = to.container(keyedBy: Key.self)
+            try container.encode(property, forKey: .name)
         }
         
         public override func hash(into: inout Hasher) {
