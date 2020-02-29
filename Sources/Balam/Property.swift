@@ -103,7 +103,7 @@ public class Property: Codable, Hashable {
         public override func encode(to: Encoder) throws {
             try super.encode(to: to)
             var container = to.container(keyedBy: Key.self)
-            try container.encode(property, forKey: .name)
+            try container.encode(property, forKey: .property)
         }
         
         public override func hash(into: inout Hasher) {

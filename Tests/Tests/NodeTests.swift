@@ -1,5 +1,4 @@
 import XCTest
-import Combine
 @testable import Balam
 
 @available(OSX 10.15, *) final class NodeTests: XCTestCase {
