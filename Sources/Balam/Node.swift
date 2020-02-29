@@ -14,14 +14,14 @@ struct Node: Codable, Hashable {
         var container = try from.unkeyedContainer()
         name = try container.decode(String.self)
         items = try container.decode(Set<Data>.self)
-        properties = Serialiser.decode(container)
+        properties = Property.decode(container)
     }
     
     func encode(to: Encoder) throws {
         var container = to.unkeyedContainer()
         try container.encode(name)
         try container.encode(items)
-        Serialiser.encode(container, properties: properties)
+        Property.encode(container, properties: properties)
     }
     
     func hash(into: inout Hasher) {

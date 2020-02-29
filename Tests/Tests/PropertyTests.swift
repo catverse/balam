@@ -29,4 +29,49 @@ final class PropertyTests: XCTestCase {
         XCTAssertEqual(1, Set<Property>([.Optional(.String("a")), .Optional(.String("a"))]).count)
         XCTAssertEqual(1, Set<Property>([.Custom("a"), .Custom("a")]).count)
     }
+    
+    func testString() {
+        struct Model: Codable {
+            var a = ""
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.String("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
+    
+    func testDouble() {
+        struct Model: Codable {
+            var a = Double()
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Double("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
+    
+    func testOptionalString() {
+        struct Model: Codable {
+            var a: String? = ""
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Optional(.String("a")), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
+    
+    func testOptionalArrayString() {
+        struct Model: Codable {
+            var a: [String]? = [""]
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Optional(.Array(.String("a"))), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
+    
+    func testDictionary() {
+        struct Model: Codable {
+            var a = ["hello" : 1]
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Dictionary("a", key: .String(""), value: .Int("")), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
 }

@@ -92,12 +92,12 @@ public class Property: Codable, Hashable {
         }
         
         required init(from: Decoder) throws {
-            property = try! Serialiser.decode(from.unkeyedContainer()).first!
+            property = try! Property.decode(from.unkeyedContainer()).first!
             try! super.init(from: from)
         }
         
         public override func encode(to: Encoder) throws {
-            Serialiser.encode(to.unkeyedContainer(), properties: .init(arrayLiteral: property))
+            Property.encode(to.unkeyedContainer(), properties: .init(arrayLiteral: property))
         }
         
         public override func hash(into: inout Hasher) {
@@ -121,4 +121,43 @@ public class Property: Codable, Hashable {
     public static func == (lhs: Property, rhs: Property) -> Bool {
         lhs.equals(rhs)
     }
+    
+    class func encode(_ container: UnkeyedEncodingContainer, properties: Swift.Set<Property>) {
+        var container = container
+        properties.forEach { property in
+            try! container.encode(Swift.UInt8(list.firstIndex { $0 == type(of: property) }!))
+            try! container.encode(property)
+        }
+    }
+    
+    class func decode(_ container: UnkeyedDecodingContainer) -> Swift.Set<Property> {
+        var set = Swift.Set<Property>()
+        var container = container
+        while !container.isAtEnd {
+            try! set.insert(container.decode(list[.init(container.decode(Swift.UInt8.self))]))
+        }
+        return set
+    }
+    
+    private static let list = [
+        Custom.self,
+        Optional.self,
+        Array.self,
+        Set.self,
+        String.self,
+        Int.self,
+        Double.self,
+        Float.self,
+        Boolean.self,
+        Date.self,
+        Data.self,
+        UInt8.self,
+        UInt16.self,
+        UInt32.self,
+        UInt64.self,
+        Int8.self,
+        Int16.self,
+        Int32.self,
+        Int64.self,
+        Dictionary.self]
 }
