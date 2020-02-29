@@ -19,4 +19,13 @@ final class SerialiserTests: XCTestCase {
         let node = Node(Model())
         XCTAssertEqual(Property.Double("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
+    
+    func testOptionalString() {
+        struct Model: Codable {
+            var a: String? = ""
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Optional(.String("a")), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
 }

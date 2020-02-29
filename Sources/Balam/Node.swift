@@ -11,17 +11,17 @@ struct Node: Codable, Hashable {
     }
     
     init(from: Decoder) throws {
-        let values = try from.container(keyedBy: Key.self)
-        items = try values.decode(Set<Data>.self, forKey: .items)
-        name = try values.decode(String.self, forKey: .name)
-        properties = try Serialiser.decode(values.nestedUnkeyedContainer(forKey: .properties))
+        var container = try from.unkeyedContainer()
+        name = try container.decode(String.self)
+        items = try container.decode(Set<Data>.self)
+        properties = Serialiser.decode(container)
     }
     
     func encode(to: Encoder) throws {
-        var container = to.container(keyedBy: Key.self)
-        try container.encode(items, forKey: .items)
-        try container.encode(name, forKey: .name)
-        Serialiser.encode(container.nestedUnkeyedContainer(forKey: .properties), properties: properties)
+        var container = to.unkeyedContainer()
+        try container.encode(name)
+        try container.encode(items)
+        Serialiser.encode(container, properties: properties)
     }
     
     func hash(into: inout Hasher) {
@@ -35,12 +35,5 @@ struct Node: Codable, Hashable {
     
     static func == (lhs: Node, rhs: Node) -> Bool {
         lhs.name == rhs.name && lhs.properties == rhs.properties
-    }
-    
-    private enum Key: CodingKey {
-        case
-        items,
-        name,
-        properties
     }
 }

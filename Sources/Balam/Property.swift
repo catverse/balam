@@ -63,14 +63,14 @@ public class Property: Codable, Hashable {
         }
         
         required init(from: Decoder) throws {
-            try name = from.container(keyedBy: Key.self).decode(Swift.String.self, forKey: .name)
-            try super.init(from: from)
+            var container = try! from.unkeyedContainer()
+            name = try! container.decode(Swift.String.self)
+            try! super.init(from: from)
         }
         
         public override func encode(to: Encoder) throws {
-            try super.encode(to: to)
-            var container = to.container(keyedBy: Key.self)
-            try container.encode(name, forKey: .name)
+            var container = to.unkeyedContainer()
+            try! container.encode(name)
         }
         
         public override func hash(into: inout Hasher) {
@@ -80,10 +80,6 @@ public class Property: Codable, Hashable {
         
         override func equals(_ property: Property) -> Bool {
             super.equals(property) && name == (property as! Concrete).name
-        }
-        
-        private enum Key: CodingKey {
-            case name
         }
     }
     
@@ -96,14 +92,12 @@ public class Property: Codable, Hashable {
         }
         
         required init(from: Decoder) throws {
-            try property = from.container(keyedBy: Key.self).decode(Property.self, forKey: .property)
-            try super.init(from: from)
+            property = try! Serialiser.decode(from.unkeyedContainer()).first!
+            try! super.init(from: from)
         }
         
         public override func encode(to: Encoder) throws {
-            try super.encode(to: to)
-            var container = to.container(keyedBy: Key.self)
-            try container.encode(property, forKey: .property)
+            Serialiser.encode(to.unkeyedContainer(), properties: .init(arrayLiteral: property))
         }
         
         public override func hash(into: inout Hasher) {
@@ -113,10 +107,6 @@ public class Property: Codable, Hashable {
         
         override func equals(_ property: Property) -> Bool {
             super.equals(property) && self.property == (property as! Wrap).property
-        }
-        
-        private enum Key: CodingKey {
-            case property
         }
     }
     
