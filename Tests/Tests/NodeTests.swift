@@ -40,6 +40,7 @@ import XCTest
             var timeIntervalNil: TimeInterval?
             var dateNil: Date?
             var dataNil: Data?
+            var dict = ["hello" : 1]
         }
         
         let node = Node(Model())
@@ -80,5 +81,6 @@ import XCTest
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Date)?.name == "dateNil" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Optional }.first { ($0.property as? Property.Data)?.name == "dataNil" })
         XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Array }.first { (($0.property as? Property.Array)?.property as? Property.String)?.name == "arrArrString" })
+        XCTAssertNotNil(node.properties.compactMap { $0 as? Property.Dictionary }.first { $0.name == "dict" })
     }
 }

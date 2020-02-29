@@ -20,7 +20,13 @@ extension Mirror {
     }
     
     private func wrapped(_ name: String, value: Any) -> Property {
-        value is [Any] ? .Array((value as! [Any]).first.map { wrapped(name, value: $0) } ?? .Custom(name)) : child(name, value: value)
+        value is [Any]
+            ? .Array((value as! [Any]).first.map { wrapped(name, value: $0) } ?? .Custom(name))
+            : value is [AnyHashable : Any]
+            ? .Dictionary(name,
+                          key: (value as! [AnyHashable : Any]).keys.first.map { wrapped("", value: $0) } ?? .Custom(""),
+                          value: (value as! [AnyHashable : Any]).values.first.map { wrapped("", value: $0) } ?? .Custom(""))
+                : child(name, value: value)
     }
     
     private func child(_ name: String, value: Any) -> Property {

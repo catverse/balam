@@ -32,9 +32,17 @@ public class Property: Codable, Hashable {
         }
         
         required init(from: Decoder) throws {
-            try key = from.container(keyedBy: Key.self).decode(Property.self, forKey: .key)
-            try value = from.container(keyedBy: Key.self).decode(Property.self, forKey: .value)
-            try super.init(from: from)
+            var container = try! from.unkeyedContainer()
+            key = Property.decode(&container)
+            value = Property.decode(&container)
+            try! super.init(from: container.superDecoder())
+        }
+        
+        public override func encode(to: Encoder) throws {
+            var container = to.unkeyedContainer()
+            Property.encode(&container, property: key)
+            Property.encode(&container, property: value)
+            try! super.encode(to: container.superEncoder())
         }
         
         public override func hash(into: inout Hasher) {
@@ -45,12 +53,6 @@ public class Property: Codable, Hashable {
         
         override func equals(_ property: Property) -> Bool {
             super.equals(property) && self.key == (property as! Dictionary).key && self.value == (property as! Dictionary).value
-        }
-        
-        private enum Key: CodingKey {
-            case
-            key,
-            value
         }
     }
     
@@ -65,12 +67,13 @@ public class Property: Codable, Hashable {
         required init(from: Decoder) throws {
             var container = try! from.unkeyedContainer()
             name = try! container.decode(Swift.String.self)
-            try! super.init(from: from)
+            try! super.init(from: container.superDecoder())
         }
         
         public override func encode(to: Encoder) throws {
             var container = to.unkeyedContainer()
             try! container.encode(name)
+            try! super.encode(to: container.superEncoder())
         }
         
         public override func hash(into: inout Hasher) {
@@ -92,12 +95,15 @@ public class Property: Codable, Hashable {
         }
         
         required init(from: Decoder) throws {
-            property = try! Property.decode(from.unkeyedContainer()).first!
-            try! super.init(from: from)
+            var container = try! from.unkeyedContainer()
+            property = Property.decode(&container)
+            try! super.init(from: container.superDecoder())
         }
         
         public override func encode(to: Encoder) throws {
-            Property.encode(to.unkeyedContainer(), properties: .init(arrayLiteral: property))
+            var container = to.unkeyedContainer()
+            Property.encode(&container, property: property)
+            try! super.encode(to: container.superEncoder())
         }
         
         public override func hash(into: inout Hasher) {
@@ -124,19 +130,25 @@ public class Property: Codable, Hashable {
     
     class func encode(_ container: UnkeyedEncodingContainer, properties: Swift.Set<Property>) {
         var container = container
-        properties.forEach { property in
-            try! container.encode(Swift.UInt8(list.firstIndex { $0 == type(of: property) }!))
-            try! container.encode(property)
-        }
+        properties.forEach { encode(&container, property: $0) }
     }
     
     class func decode(_ container: UnkeyedDecodingContainer) -> Swift.Set<Property> {
         var set = Swift.Set<Property>()
         var container = container
         while !container.isAtEnd {
-            try! set.insert(container.decode(list[.init(container.decode(Swift.UInt8.self))]))
+            set.insert(decode(&container))
         }
         return set
+    }
+    
+    private class func encode(_ container: inout UnkeyedEncodingContainer, property: Property) {
+        try! container.encode(Swift.UInt8(list.firstIndex { $0 == type(of: property) }!))
+        try! container.encode(property)
+    }
+    
+    private class func decode(_ container: inout UnkeyedDecodingContainer) -> Property {
+        return try! container.decode(list[.init(container.decode(Swift.UInt8.self))])
     }
     
     private static let list = [
