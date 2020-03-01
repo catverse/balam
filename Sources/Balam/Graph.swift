@@ -19,21 +19,25 @@ import Combine
         self.nodes = nodes
     }
     
+    deinit {
+        print("de init graph")
+    }
+    
     public func add<T>(_ node: T) where T : Codable {
-        queue.async { [weak self] in self?._add(node) }
+        queue.async { self._add(node) }
     }
     
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
-        .init { [weak self] promise in
-            self?.queue.async {
-                promise(.success(self?._nodes(type) ?? []))
+        .init { promise in
+            self.queue.async {
+                promise(.success(self._nodes(type) ?? []))
             }
         }
     }
     
     public func update<T>(_ node: T) where T : Codable {
-        queue.async { [weak self] in
-            self?.update(node)
+        queue.async {
+            self.update(node)
         }
     }
     
