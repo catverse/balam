@@ -23,6 +23,10 @@ import Combine
         queue.async { self._add(node) }
     }
     
+    public func add<T>(_ node: T) where T : Codable, T : Identifiable {
+        queue.async { self._add(node) }
+    }
+    
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { promise in
             self.queue.async {
@@ -37,19 +41,19 @@ import Combine
         }
     }
     
+    func _add<T>(_ node: T) where T : Codable, T : Identifiable {
+        _update(node)
+    }
+    
     func _add<T>(_ node: T) where T : Codable {
         var container = find(.init(node))
-        try! container.items.insert(JSONEncoder().encode(node))
-        nodes.insert(container)
-        save()
+        insert(node, container: &container)
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
         container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
-        try! container.items.insert(JSONEncoder().encode(node))
-        nodes.insert(container)
-        save()
+        insert(node, container: &container)
     }
     
     func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
@@ -64,6 +68,12 @@ import Combine
     
     private func save() {
         try! (JSONEncoder().encode(nodes) as NSData).compressed(using: .lzfse).write(to: url, options: .atomic)
+    }
+    
+    private func insert<T>(_ node: T, container: inout Node) where T : Codable {
+        try! container.items.insert(JSONEncoder().encode(node))
+        nodes.insert(container)
+        save()
     }
     
     private func find(_ node: Node) -> Node {

@@ -76,6 +76,16 @@ import XCTest
         }
     }
     
+    func testAddDuplicate() {
+        let graph = Graph(url, queue: .main)
+        var user = UserWithId()
+        graph._add(user)
+        user.name = "another name"
+        user.age = 321
+        graph._add(user)
+        XCTAssertEqual(1, graph._nodes(UserWithId.self)?.count)
+    }
+    
     private func addClassv1(_ graph: Graph) {
         struct Model: Codable {
             let phone: Float
