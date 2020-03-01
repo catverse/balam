@@ -19,10 +19,6 @@ import Combine
         self.nodes = nodes
     }
     
-    deinit {
-        print("de init graph")
-    }
-    
     public func add<T>(_ node: T) where T : Codable {
         queue.async { self._add(node) }
     }
@@ -36,8 +32,8 @@ import Combine
     }
     
     public func update<T>(_ node: T) where T : Codable, T : Identifiable {
-        queue.async { [weak self] in
-            self?._update(node)
+        queue.async {
+            self._update(node)
         }
     }
     
