@@ -36,8 +36,8 @@ import Combine
     }
     
     public func update<T>(_ node: T) where T : Codable, T : Identifiable {
-        queue.async {
-            self._update(node)
+        queue.async { [weak self] in
+            self?._update(node)
         }
     }
     
