@@ -41,4 +41,13 @@ import Combine
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testUsingNameOnly() {
+        let expect = expectation(description: "")
+        Balam.graph("test").sink { _ in
+            XCTAssertTrue(FileManager.default.fileExists(atPath: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam").path))
+            expect.fulfill()
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
 }
