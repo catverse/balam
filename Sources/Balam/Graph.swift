@@ -35,9 +35,9 @@ import Combine
         }
     }
     
-    public func update<T>(_ node: T) where T : Codable {
+    public func update<T>(_ node: T) where T : Codable, T : Identifiable {
         queue.async {
-            self.update(node)
+            self._update(node)
         }
     }
     
