@@ -14,6 +14,7 @@ import Combine
     
     override func tearDown() {
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
     func testCreate() {
