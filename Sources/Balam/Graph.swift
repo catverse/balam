@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 @available(OSX 10.15, *) public final class Graph {
-    private(set) var nodes = Set<Node>()
+    public private(set) var nodes = Set<Node>()
     private let url: URL
     private let queue: DispatchQueue
     
