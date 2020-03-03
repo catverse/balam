@@ -14,4 +14,13 @@ import Combine
             }
         }
     }
+    
+    public class func nodes(_ url: URL) -> Future<Set<Node>, Never> {
+        .init { promise in
+            let queue = DispatchQueue(label: "", qos: .utility)
+            queue.async {
+                promise(.success(Graph(url, queue: queue).nodes))
+            }
+        }
+    }
 }

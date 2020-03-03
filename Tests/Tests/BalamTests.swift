@@ -51,4 +51,23 @@ import Combine
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testLoadNodes() {
+        struct User: Codable {
+            var name = ""
+        }
+        let expect = expectation(description: "")
+        Balam.graph(url).sink {
+            var user = User()
+            user.name = "lorem"
+            $0._add(user)
+            Balam.nodes(self.url).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual(1, $0.first?.properties.count)
+                XCTAssertEqual("User", $0.first?.name)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
 }
