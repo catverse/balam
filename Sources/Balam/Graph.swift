@@ -56,6 +56,10 @@ import Combine
         insert(node, container: &container)
     }
     
+    func _remove<T>(_ node: T) where T : Codable, T : Identifiable {
+        
+    }
+    
     func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
         nodes.filter { $0.name == .init(describing: type) }.first {
             guard

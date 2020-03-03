@@ -65,6 +65,19 @@ import XCTest
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
+    func testRemoveNode() {
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
+        graph._add(UserWithId())
+        var user = graph._nodes(UserWithId.self)!.first!
+        user.name = "hello world"
+        user.age = 456
+        graph._remove(user)
+        let users = graph._nodes(UserWithId.self)
+        XCTAssertEqual(true, users?.isEmpty)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
     func testDifferentClassesSameName() {
         let graph = Graph(url, queue: .main)
         addClassv1(graph)
