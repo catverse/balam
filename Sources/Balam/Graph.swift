@@ -27,17 +27,27 @@ import Combine
         queue.async { self._add(node) }
     }
     
+    public func add<T>(_ nodes: [T]) where T : Codable {
+        queue.async { self._add(nodes) }
+    }
+    
+    public func add<T>(_ nodes: [T]) where T : Codable, T : Identifiable {
+        queue.async { self._add(nodes) }
+    }
+    
+    public func update<T>(_ node: T) where T : Codable, T : Identifiable {
+        queue.async { self._update(node) }
+    }
+    
+    public func remove<T>(_ node: T) where T : Codable, T : Identifiable {
+        queue.async { self._remove(node) }
+    }
+    
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { promise in
             self.queue.async {
                 promise(.success(self._nodes(type) ?? []))
             }
-        }
-    }
-    
-    public func update<T>(_ node: T) where T : Codable, T : Identifiable {
-        queue.async {
-            self._update(node)
         }
     }
     
@@ -52,6 +62,29 @@ import Combine
         save()
     }
     
+    func _add<T>(_ nodes: [T]) where T : Codable {
+        nodes.first.map {
+            var container = find(.init($0))
+            nodes.forEach {
+                try! container.items.insert(JSONEncoder().encode($0))
+            }
+            self.nodes.insert(container)
+            save()
+        }
+    }
+    
+    func _add<T>(_ nodes: [T]) where T : Codable, T : Identifiable {
+        nodes.first.map {
+            var container = find(.init($0))
+            nodes.forEach { node in
+                container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
+                try! container.items.insert(JSONEncoder().encode(node))
+            }
+            self.nodes.insert(container)
+            save()
+        }
+    }
+    
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
         _remove(node, container: &container)
@@ -61,9 +94,7 @@ import Combine
     
     func _remove<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
-        print(container.items.count)
         _remove(node, container: &container)
-        print(container.items.count)
         nodes.insert(container)
         save()
     }

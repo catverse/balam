@@ -48,6 +48,48 @@ import XCTest
         }
     }
     
+    func testAddBatch() {
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
+        var first = User()
+        first.age = 22
+        var second = User()
+        second.age = 33
+        var third = User()
+        third.age = 18
+        var fourth = User()
+        fourth.age = 21
+        graph._add([first, second, third, fourth])
+        XCTAssertEqual(1, graph.nodes.count)
+        graph.nodes.first.map {
+            XCTAssertEqual("User", $0.name)
+            XCTAssertEqual(4, $0.items.count)
+        }
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
+    func testAddBatchWithId() {
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
+        var first = UserWithId()
+        first.id = 21
+        first.age = 33
+        var second = UserWithId()
+        second.id = 33
+        var third = UserWithId()
+        third.id = 18
+        var fourth = UserWithId()
+        fourth.id = 21
+        fourth.age = 99
+        graph._add([first, second, third, fourth])
+        XCTAssertEqual(1, graph.nodes.count)
+        graph.nodes.first.map {
+            XCTAssertEqual("UserWithId", $0.name)
+            XCTAssertEqual(3, $0.items.count)
+        }
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
     func testAddAndRetrieveNode() {
         let graph = Graph(url, queue: .main)
         graph._add(User())
@@ -93,6 +135,27 @@ import XCTest
         XCTAssertEqual(2, graph._nodes(UserWithId.self)?.count)
         graph._remove(other)
         XCTAssertEqual(1, graph._nodes(UserWithId.self)?.count)
+    }
+    
+    func testRemoveWithClosure() {
+        let graph = Graph(url, queue: .main)
+        var first = User()
+        first.age = 22
+        var second = User()
+        second.age = 33
+        var third = User()
+        third.age = 22
+        var fourth = User()
+        fourth.age = 21
+        graph._add(first)
+        graph._add(second)
+        graph._add(third)
+        graph._add(fourth)
+//        XCTAssertEqual(1, graph.nodes.count)
+//        graph.nodes.forEach {
+//            XCTAssertEqual("User", $0.name)
+//            XCTAssertEqual(3, $0.items.count)
+//        }
     }
     
     func testDifferentClassesSameName() {

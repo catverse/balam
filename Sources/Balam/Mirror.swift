@@ -3,11 +3,13 @@ import Foundation
 extension Mirror {
     func reflect<T>(_ object: T) -> Set<Property> where T : Codable {
         children.reduce(into: .init()) {
-            $0.insert(isNil($1.1)
-                ? .Optional(guess($1.0!, object: object))
+            let property = $1.0 ?? ""
+            let value = $1.1
+            $0.insert(isNil(value)
+                ? .Optional(guess(property, object: object))
                 : {
                     $1 == .optional ? .Optional($0) : $0
-                } (isEmpty($1.1) ? guess($1.0!, object: object) : wrapped($1.0!, value: $1.1), Mirror(reflecting: $1.1).displayStyle))
+                } (isEmpty(value) ? guess(property, object: object) : wrapped(property, value: value), Mirror(reflecting: value).displayStyle))
         }
     }
     
