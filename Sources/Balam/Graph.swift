@@ -43,21 +43,29 @@ import Combine
     
     func _add<T>(_ node: T) where T : Codable, T : Identifiable {
         _update(node)
+        save()
     }
     
     func _add<T>(_ node: T) where T : Codable {
         var container = find(.init(node))
         insert(node, container: &container)
+        save()
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
-        container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
+        _remove(node, container: &container)
         insert(node, container: &container)
+        save()
     }
     
     func _remove<T>(_ node: T) where T : Codable, T : Identifiable {
-        
+        var container = find(.init(node))
+        print(container.items.count)
+        _remove(node, container: &container)
+        print(container.items.count)
+        nodes.insert(container)
+        save()
     }
     
     func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
@@ -70,17 +78,20 @@ import Combine
         }?.items.map { try! JSONDecoder().decode(type, from: $0) }
     }
     
-    private func save() {
-        try! (JSONEncoder().encode(nodes) as NSData).compressed(using: .lzfse).write(to: url, options: .atomic)
-    }
-    
     private func insert<T>(_ node: T, container: inout Node) where T : Codable {
         try! container.items.insert(JSONEncoder().encode(node))
         nodes.insert(container)
-        save()
+    }
+    
+    private func _remove<T>(_ node: T, container: inout Node) where T : Codable, T : Identifiable {
+        container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
     }
     
     private func find(_ node: Node) -> Node {
         nodes.remove(node) ?? node
+    }
+    
+    private func save() {
+        try! (JSONEncoder().encode(nodes) as NSData).compressed(using: .lzfse).write(to: url, options: .atomic)
     }
 }
