@@ -107,7 +107,7 @@ import Combine
         guard var container = find(type) else { return }
         nodes.remove(container)
         container.items = container.items.reduce(into: .init()) {
-            guard when(try! JSONDecoder().decode(T.self, from: $1)) else { return }
+            guard !when(try! JSONDecoder().decode(T.self, from: $1)) else { return }
             $0.insert($1)
         }
         nodes.insert(container)

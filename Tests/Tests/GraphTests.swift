@@ -148,11 +148,13 @@ import XCTest
         third.age = 22
         var fourth = User()
         fourth.age = 21
+        var fifth = User()
+        fifth.age = 15
         XCTAssertNil(graph._nodes(User.self))
-        graph._add([first, second, third, fourth])
-        XCTAssertEqual(4, graph._nodes(User.self)?.count)
+        graph._add([first, second, third, fourth, fifth])
+        XCTAssertEqual(5, graph._nodes(User.self)?.count)
         graph._remove(User.self) { $0.age == 22 }
-        XCTAssertEqual(2, graph._nodes(User.self)?.count)
+        XCTAssertEqual(3, graph._nodes(User.self)?.count)
         XCTAssertEqual(1, graph.nodes.count)
     }
     
