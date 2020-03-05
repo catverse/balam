@@ -87,26 +87,31 @@ import Combine
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
-        _remove(node, container: &container)
+        remove(node, container: &container)
         insert(node, container: &container)
         save()
     }
     
     func _remove<T>(_ node: T) where T : Codable, T : Identifiable {
         var container = find(.init(node))
-        _remove(node, container: &container)
+        remove(node, container: &container)
+        nodes.insert(container)
+        save()
+    }
+    
+    func _remove<T>(_ type: T.Type, when: (T) -> Bool) where T : Codable {
+        guard var container = find(type) else { return }
+        nodes.remove(container)
+        container.items = container.items.reduce(into: .init()) {
+            guard when(try! JSONDecoder().decode(T.self, from: $1)) else { return }
+            $0.insert($1)
+        }
         nodes.insert(container)
         save()
     }
     
     func _nodes<T>(_ type: T.Type) -> [T]? where T : Codable {
-        nodes.filter { $0.name == .init(describing: type) }.first {
-            guard
-                let item = $0.items.first,
-                let decoded = try? JSONDecoder().decode(type, from: item)
-            else { return false }
-            return $0 == Node(decoded)
-        }?.items.map { try! JSONDecoder().decode(type, from: $0) }
+        find(type)?.items.map { try! JSONDecoder().decode(type, from: $0) }
     }
     
     private func insert<T>(_ node: T, container: inout Node) where T : Codable {
@@ -114,12 +119,22 @@ import Combine
         nodes.insert(container)
     }
     
-    private func _remove<T>(_ node: T, container: inout Node) where T : Codable, T : Identifiable {
+    private func remove<T>(_ node: T, container: inout Node) where T : Codable, T : Identifiable {
         container.items.firstIndex { try! JSONDecoder().decode(T.self, from: $0).id == node.id }.map { _ = container.items.remove(at: $0) }
     }
     
     private func find(_ node: Node) -> Node {
         nodes.remove(node) ?? node
+    }
+    
+    private func find<T>(_ type: T.Type) -> Node? where T : Codable {
+        nodes.filter { $0.name == .init(describing: type) }.first {
+            guard
+                let item = $0.items.first,
+                let decoded = try? JSONDecoder().decode(type, from: item)
+            else { return false }
+            return $0 == Node(decoded)
+        }
     }
     
     private func save() {
