@@ -43,6 +43,10 @@ import Combine
         queue.async { self._remove(node) }
     }
     
+    public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
+        queue.async { self._remove(type, when: when) }
+    }
+    
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { promise in
             self.queue.async {
@@ -99,7 +103,7 @@ import Combine
         save()
     }
     
-    func _remove<T>(_ type: T.Type, when: (T) -> Bool) where T : Codable {
+    func _remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
         guard var container = find(type) else { return }
         nodes.remove(container)
         container.items = container.items.reduce(into: .init()) {
