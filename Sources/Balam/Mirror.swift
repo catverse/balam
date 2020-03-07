@@ -48,7 +48,7 @@ extension Mirror {
         case is Int16: return .Int16(name)
         case is Int32: return .Int32(name)
         case is Int64: return .Int64(name)
-        case is URL: return .Url(name)
+        case is URL: return .URL(name)
         default: return .Custom(name)
         }
     }

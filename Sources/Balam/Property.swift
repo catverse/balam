@@ -20,7 +20,7 @@ public class Property: Codable, Hashable {
     public final class Int16: Concrete { }
     public final class Int32: Concrete { }
     public final class Int64: Concrete { }
-    public final class Url: Concrete { }
+    public final class URL: Concrete { }
     
     public final class Dictionary: Concrete {
         public let key: Property
@@ -172,6 +172,6 @@ public class Property: Codable, Hashable {
         Int16.self,
         Int32.self,
         Int64.self,
-        Url.self,
+        URL.self,
         Dictionary.self]
 }

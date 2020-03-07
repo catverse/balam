@@ -101,6 +101,6 @@ final class PropertyTests: XCTestCase {
         }
         
         let node = Node(Model())
-        XCTAssertEqual(Property.Url("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+        XCTAssertEqual(Property.URL("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
 }
