@@ -49,6 +49,7 @@ extension Mirror {
         case is Int32: return .Int32(name)
         case is Int64: return .Int64(name)
         case is URL: return .URL(name)
+        case is UUID: return .UUID(name)
         default: return .Custom(name)
         }
     }

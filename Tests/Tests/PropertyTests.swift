@@ -95,12 +95,21 @@ final class PropertyTests: XCTestCase {
         XCTAssertEqual(Property.Dictionary("a", key: .String(""), value: .Array(.String(""))), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
     
-    func testUrl() {
+    func testURL() {
         struct Model: Codable {
             var a = URL(string: "www.google.com")!
         }
         
         let node = Node(Model())
         XCTAssertEqual(Property.URL("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
+    
+    func testUUID() {
+        struct Model: Codable {
+            var a = UUID()
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.UUID("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
 }
