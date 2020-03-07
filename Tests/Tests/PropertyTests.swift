@@ -94,4 +94,13 @@ final class PropertyTests: XCTestCase {
         let node = Node(Model())
         XCTAssertEqual(Property.Dictionary("a", key: .String(""), value: .Array(.String(""))), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
     }
+    
+    func testUrl() {
+        struct Model: Codable {
+            var a = URL(string: "www.google.com")!
+        }
+        
+        let node = Node(Model())
+        XCTAssertEqual(Property.Url("a"), try? JSONDecoder().decode(Node.self, from: JSONEncoder().encode(node)).properties.first)
+    }
 }
