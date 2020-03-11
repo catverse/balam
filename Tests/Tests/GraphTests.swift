@@ -30,6 +30,16 @@ import XCTest
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
+    func testAddWithIdNotUpdate() {
+        let graph = Graph(url, queue: .main)
+        var user = UserWithId()
+        graph._add(user)
+        user.name = "john test"
+        graph._add(user)
+        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual("Some name", graph._nodes(UserWithId.self)?.first?.name)
+    }
+    
     func testAddThreeNodes() {
         let graph = Graph(url, queue: .main)
         var first = User()
@@ -169,7 +179,7 @@ import XCTest
         }
     }
     
-    func testAddDuplicate() {
+    func testAddNotDuplicateWithId() {
         let graph = Graph(url, queue: .main)
         var user = UserWithId()
         graph._add(user)
@@ -177,6 +187,14 @@ import XCTest
         user.age = 321
         graph._add(user)
         XCTAssertEqual(1, graph._nodes(UserWithId.self)?.count)
+    }
+    
+    func testAddNotDuplicate() {
+        let graph = Graph(url, queue: .main)
+        let user = User()
+        graph._add(user)
+        graph._add(user)
+        XCTAssertEqual(1, graph._nodes(User.self)?.count)
     }
     
     private func addClassv1(_ graph: Graph) {
