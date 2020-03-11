@@ -66,6 +66,8 @@ import Combine
         if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0) == node } {
             insert(node, container: &container)
             save()
+        } else {
+            nodes.insert(container)
         }
     }
     

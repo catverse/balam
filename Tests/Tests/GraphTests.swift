@@ -30,6 +30,25 @@ import XCTest
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
+    func testAddEquatable() {
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
+        graph._add(UserEqual())
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
+    func testAddEquatableDuplicates() {
+        let graph = Graph(url, queue: .main)
+        var user = UserEqual()
+        graph._add(user)
+        graph._add(user)
+        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        user.name = "lorem"
+        graph._add(user)
+        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual("hello", graph._nodes(UserEqual.self)?.first?.name)
+    }
+    
     func testAddWithIdNotUpdate() {
         let graph = Graph(url, queue: .main)
         var user = UserWithId()
@@ -230,4 +249,13 @@ private struct UserWithId: Codable, Identifiable {
     var id = 0
     var name = "Some name"
     var age = 123
+}
+
+private struct UserEqual: Codable, Equatable {
+    var id = 1
+    var name = "hello"
+    
+    static func == (lhs: UserEqual, rhs: UserEqual) -> Bool {
+        lhs.id == rhs.id
+    }
 }
