@@ -23,11 +23,15 @@ import Combine
         queue.async { self._add(node) }
     }
     
-    public func add<T>(_ nodes: [T]) where T : Codable {
-        queue.async { self._add(nodes) }
+    public func add<T>(_ node: T) where T : Codable & Equatable {
+        queue.async { self._add(node) }
     }
     
-    public func add<T>(_ nodes: [T]) where T : Codable, T : Identifiable {
+    public func add<T>(_ node: T) where T : Codable & Identifiable {
+        queue.async { self._add(node) }
+    }
+    
+    public func add<T>(_ nodes: [T]) where T : Codable {
         queue.async { self._add(nodes) }
     }
     
@@ -51,17 +55,13 @@ import Combine
         }
     }
     
-    func _add<T>(_ node: T) where T : Codable, T : Identifiable {
+    func _add<T>(_ node: T) where T : Codable {
         var container = find(.init(node))
-        if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0).id == node.id } {
-            insert(node, container: &container)
-            save()
-        } else {
-            nodes.insert(container)
-        }
+        insert(node, container: &container)
+        save()
     }
     
-    func _add<T>(_ node: T) where T : Codable, T : Equatable {
+    func _add<T>(_ node: T) where T : Codable & Equatable {
         var container = find(.init(node))
         if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0) == node } {
             insert(node, container: &container)
@@ -71,10 +71,14 @@ import Combine
         }
     }
     
-    func _add<T>(_ node: T) where T : Codable {
+    func _add<T>(_ node: T) where T : Codable & Identifiable {
         var container = find(.init(node))
-        insert(node, container: &container)
-        save()
+        if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0).id == node.id } {
+            insert(node, container: &container)
+            save()
+        } else {
+            nodes.insert(container)
+        }
     }
     
     func _add<T>(_ nodes: [T]) where T : Codable {
