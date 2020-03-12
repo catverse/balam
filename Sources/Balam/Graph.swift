@@ -45,11 +45,11 @@ import Combine
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable & Identifiable {
         queue.async {
-            guard var mutable = self.items.mutate(nodes) else { return }
-            nodes.forEach { node in
-                mutable.add(node) { $0.id == node.id && $0 == node }
+            self.items.mutate(nodes) { mutable in
+                nodes.forEach { node in
+                    mutable.add(node) { $0.id == node.id && $0 == node }
+                }
             }
-            self.items.insert(mutable.storable())
         }
     }
     
