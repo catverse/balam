@@ -116,6 +116,31 @@ import XCTest
             XCTAssertEqual("UserWithId", $0.name)
             XCTAssertEqual(3, $0.items.count)
         }
+        XCTAssertEqual(33, graph._nodes(UserWithId.self)?.first { $0.id == 21 }?.age)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
+    func testAddBatchWithIdDuplicates() {
+        let graph = Graph(url, queue: .main)
+        var first = UserWithId()
+        first.id = 21
+        first.age = 33
+        graph._add(first)
+        first.age = 55
+        var second = UserWithId()
+        second.id = 33
+        var third = UserWithId()
+        third.id = 18
+        var fourth = UserWithId()
+        fourth.id = 21
+        fourth.age = 99
+        graph._add([first, second, third, fourth])
+        XCTAssertEqual(1, graph.nodes.count)
+        graph.nodes.first.map {
+            XCTAssertEqual("UserWithId", $0.name)
+            XCTAssertEqual(3, $0.items.count)
+        }
+        XCTAssertEqual(33, graph._nodes(UserWithId.self)?.first { $0.id == 21 }?.age)
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     

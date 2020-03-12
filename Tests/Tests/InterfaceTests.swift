@@ -74,6 +74,41 @@ import Balam
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testAddNoDuplicates() {
+        let expect = expectation(description: "")
+        Balam.graph(url).sink {
+            $0.add(User())
+            $0.add([User(), User()])
+            $0.nodes(User.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testAddWithIdNoDuplicates() {
+        let expect = expectation(description: "")
+        var user1 = UserId()
+        user1.id = 1
+        user1.name = "hello"
+        var user2 = UserId()
+        user2.id = 2
+        var user3 = UserId()
+        user3.id = 1
+        user3.name = "world"
+        Balam.graph(url).sink {
+            $0.add(user3)
+            $0.add([user1, user2, user3])
+            $0.nodes(UserId.self).sink {
+                XCTAssertEqual(2, $0.count)
+                XCTAssertEqual("world", $0.first { $0.id == 1 }?.name)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
 }
 
 private struct User: Codable {
