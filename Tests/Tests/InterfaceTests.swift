@@ -75,7 +75,7 @@ import Balam
         waitForExpectations(timeout: 1)
     }
     
-    func testAddNoDuplicates() {
+    func testAddBatchNotDuplicates() {
         let expect = expectation(description: "")
         Balam.graph(url).sink {
             $0.add(User())
@@ -88,7 +88,7 @@ import Balam
         waitForExpectations(timeout: 1)
     }
     
-    func testAddWithIdNoDuplicates() {
+    func testAddBathWithIdNotDuplicates() {
         let expect = expectation(description: "")
         var user1 = UserId()
         user1.id = 1
@@ -102,6 +102,28 @@ import Balam
             $0.add(user3)
             $0.add([user1, user2, user3])
             $0.nodes(UserId.self).sink {
+                XCTAssertEqual(2, $0.count)
+                XCTAssertEqual("world", $0.first { $0.id == 1 }?.name)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testAddBathEqualsNotDuplicates() {
+        let expect = expectation(description: "")
+        var user1 = UserEqual()
+        user1.id = 1
+        user1.name = "hello"
+        var user2 = UserEqual()
+        user2.id = 2
+        var user3 = UserEqual()
+        user3.id = 1
+        user3.name = "world"
+        Balam.graph(url).sink {
+            $0.add(user3)
+            $0.add([user1, user2, user3])
+            $0.nodes(UserEqual.self).sink {
                 XCTAssertEqual(2, $0.count)
                 XCTAssertEqual("world", $0.first { $0.id == 1 }?.name)
                 expect.fulfill()

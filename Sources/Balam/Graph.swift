@@ -35,6 +35,10 @@ import Combine
         queue.async { self._add(nodes) }
     }
     
+    public func add<T>(_ nodes: [T]) where T : Codable & Equatable {
+        queue.async { self._add(nodes) }
+    }
+    
     public func add<T>(_ nodes: [T]) where T : Codable & Identifiable {
         queue.async { self._add(nodes) }
     }
@@ -90,6 +94,19 @@ import Combine
             var container = find(.init($0))
             nodes.forEach {
                 try! container.items.insert(JSONEncoder().encode($0))
+            }
+            self.nodes.insert(container)
+            save()
+        }
+    }
+    
+    func _add<T>(_ nodes: [T]) where T : Codable & Equatable {
+        nodes.first.map {
+            var container = find(.init($0))
+            nodes.forEach { node in
+                if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0) == node } {
+                    try! container.items.insert(JSONEncoder().encode(node))
+                }
             }
             self.nodes.insert(container)
             save()

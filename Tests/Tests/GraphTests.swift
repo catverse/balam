@@ -141,7 +141,43 @@ import XCTest
             XCTAssertEqual(3, $0.items.count)
         }
         XCTAssertEqual(33, graph._nodes(UserWithId.self)?.first { $0.id == 21 }?.age)
+    }
+    
+    func testAddBatchEquatable() {
+        let graph = Graph(url, queue: .main)
+        try! FileManager.default.removeItem(at: url)
+        var first = UserEqual()
+        first.id = 21
+        first.name = "world"
+        var second = UserEqual()
+        second.id = 21
+        second.name = "hello"
+        graph._add([first, second])
+        XCTAssertEqual(1, graph.nodes.count)
+        graph.nodes.first.map {
+            XCTAssertEqual("UserEqual", $0.name)
+            XCTAssertEqual(1, $0.items.count)
+        }
+        XCTAssertEqual("world", graph._nodes(UserEqual.self)?.first { $0.id == 21 }?.name)
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
+    
+    func testAddBatchEquatableDuplicates() {
+        let graph = Graph(url, queue: .main)
+        var first = UserEqual()
+        first.id = 21
+        first.name = "world"
+        var second = UserEqual()
+        second.id = 22
+        graph._add(first)
+        first.name = "lorem"
+        graph._add([first, second])
+        XCTAssertEqual(1, graph.nodes.count)
+        graph.nodes.first.map {
+            XCTAssertEqual("UserEqual", $0.name)
+            XCTAssertEqual(2, $0.items.count)
+        }
+        XCTAssertEqual("world", graph._nodes(UserEqual.self)?.first { $0.id == 21 }?.name)
     }
     
     func testAddAndRetrieveNode() {
