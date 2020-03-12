@@ -19,7 +19,7 @@ import Combine
         .init { promise in
             let queue = DispatchQueue(label: "", qos: .utility)
             queue.async {
-                promise(.success(Graph(url, queue: queue).nodes))
+                promise(.success(Graph(url, queue: queue).items))
             }
         }
     }

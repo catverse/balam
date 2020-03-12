@@ -17,9 +17,9 @@ import XCTest
         let graph = Graph(url, queue: .main)
         try! FileManager.default.removeItem(at: url)
         graph._add(User())
-        XCTAssertEqual(1, graph.nodes.count)
-        XCTAssertEqual("User", graph.nodes.first?.name)
-        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual(1, graph.items.count)
+        XCTAssertEqual("User", graph.items.first?.name)
+        XCTAssertEqual(1, graph.items.first?.items.count)
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
     }
     
@@ -59,10 +59,10 @@ import XCTest
         var user = UserEqual()
         graph._add(user)
         graph._add(user)
-        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual(1, graph.items.first?.items.count)
         user.name = "lorem"
         graph._add(user)
-        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual(1, graph.items.first?.items.count)
         XCTAssertEqual("hello", graph._nodes(UserEqual.self)?.first?.name)
     }
     
@@ -72,7 +72,7 @@ import XCTest
         graph._add(user)
         user.name = "john test"
         graph._add(user)
-        XCTAssertEqual(1, graph.nodes.first?.items.count)
+        XCTAssertEqual(1, graph.items.first?.items.count)
         XCTAssertEqual("Some name", graph._nodes(UserWithId.self)?.first?.name)
     }
     
@@ -87,8 +87,8 @@ import XCTest
         graph._add(first)
         graph._add(User())
         graph._add(last)
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.forEach {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.forEach {
             XCTAssertEqual("User", $0.name)
             XCTAssertEqual(3, $0.items.count)
         }

@@ -17,8 +17,8 @@ import XCTest
         let graph = Graph(url, queue: .main)
         addClassv1(graph)
         addClassv2(graph)
-        XCTAssertEqual(2, graph.nodes.count)
-        graph.nodes.forEach {
+        XCTAssertEqual(2, graph.items.count)
+        graph.items.forEach {
             XCTAssertEqual("Model", $0.name)
             XCTAssertEqual(1, $0.items.count)
         }

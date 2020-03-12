@@ -54,7 +54,7 @@ import XCTest
         XCTAssertEqual(5, graph._nodes(User.self)?.count)
         graph._remove(User.self) { $0.age == 22 }
         XCTAssertEqual(3, graph._nodes(User.self)?.count)
-        XCTAssertEqual(1, graph.nodes.count)
+        XCTAssertEqual(1, graph.items.count)
     }
 }
 

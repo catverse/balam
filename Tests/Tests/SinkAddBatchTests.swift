@@ -79,18 +79,25 @@ import Balam
         var user1 = UserEqualId()
         user1.id = 1
         user1.name = "hello"
+        user1.last = "ipsum"
         var user2 = UserEqualId()
         user2.id = 2
         user2.name = "hello"
         var user3 = UserEqualId()
         user3.id = 1
         user3.name = "world"
+        var user4 = UserEqualId()
+        user4.id = 2
+        user4.name = "world"
+        var user5 = UserEqualId()
+        user5.id = 1
+        user5.name = "hello"
+        user5.last = "test"
         Balam.graph(url).sink {
-            $0.add(user1)
-            $0.add([user1, user2, user3])
+            $0.add([user1, user2, user3, user4, user5])
             $0.nodes(UserEqualId.self).sink {
-                XCTAssertEqual(2, $0.count)
-                XCTAssertEqual("world", $0.first { $0.id == 1 }?.name)
+                XCTAssertEqual(4, $0.count)
+                XCTAssertEqual("ipsum", $0.first { $0.id == 1 && $0.name == "hello" }?.last)
                 expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
@@ -120,6 +127,7 @@ private struct UserEqual: Codable, Equatable {
 private struct UserEqualId: Codable, Equatable, Identifiable {
     var id = 1
     var name = "world"
+    var last = ""
     
     static func == (lhs: UserEqualId, rhs: UserEqualId) -> Bool {
         lhs.name == rhs.name

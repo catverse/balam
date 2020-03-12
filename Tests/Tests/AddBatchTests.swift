@@ -25,8 +25,8 @@ import XCTest
         var fourth = User()
         fourth.age = 21
         graph._add([first, second, third, fourth])
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.first.map {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.first.map {
             XCTAssertEqual("User", $0.name)
             XCTAssertEqual(4, $0.items.count)
         }
@@ -47,8 +47,8 @@ import XCTest
         fourth.id = 21
         fourth.age = 99
         graph._add([first, second, third, fourth])
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.first.map {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.first.map {
             XCTAssertEqual("UserWithId", $0.name)
             XCTAssertEqual(3, $0.items.count)
         }
@@ -71,8 +71,8 @@ import XCTest
         fourth.id = 21
         fourth.age = 99
         graph._add([first, second, third, fourth])
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.first.map {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.first.map {
             XCTAssertEqual("UserWithId", $0.name)
             XCTAssertEqual(3, $0.items.count)
         }
@@ -89,8 +89,8 @@ import XCTest
         second.id = 21
         second.name = "hello"
         graph._add([first, second])
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.first.map {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.first.map {
             XCTAssertEqual("UserEqual", $0.name)
             XCTAssertEqual(1, $0.items.count)
         }
@@ -108,8 +108,8 @@ import XCTest
         graph._add(first)
         first.name = "lorem"
         graph._add([first, second])
-        XCTAssertEqual(1, graph.nodes.count)
-        graph.nodes.first.map {
+        XCTAssertEqual(1, graph.items.count)
+        graph.items.first.map {
             XCTAssertEqual("UserEqual", $0.name)
             XCTAssertEqual(2, $0.items.count)
         }
