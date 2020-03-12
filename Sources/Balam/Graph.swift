@@ -24,11 +24,19 @@ import Combine
     }
     
     public func add<T>(_ node: T) where T : Codable & Equatable {
-        queue.async { self._add(node) }
+        queue.async {
+            self.items.add(node) { node == $0 }
+        }
     }
     
     public func add<T>(_ node: T) where T : Codable & Identifiable {
         queue.async { self._add(node) }
+    }
+    
+    public func add<T>(_ node: T) where T : Codable & Equatable & Identifiable {
+        queue.async {
+            self.items.add(node) { node.id == $0.id && node == $0 }
+        }
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable {
@@ -36,22 +44,18 @@ import Combine
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable {
-        queue.async { self._add(nodes) }
+        queue.async {
+            self.items.add(nodes) { $0 == $1 }
+        }
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Identifiable {
-        queue.async { self._add(nodes) }
+
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable & Identifiable {
         queue.async {
-            self.items.mutate(items: nodes) { items in
-                nodes.forEach { node in
-                    if !items.contains(where: { $0.id == node.id && $0 == node }) {
-                        items.append(node)
-                    }
-                }
-            }
+            self.items.add(nodes) { $0.id == $1.id && $0 == $1 }
         }
     }
     

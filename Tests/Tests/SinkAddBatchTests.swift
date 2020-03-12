@@ -94,6 +94,7 @@ import Balam
         user5.name = "hello"
         user5.last = "test"
         Balam.graph(url).sink {
+            $0.add(user1)
             $0.add([user1, user2, user3, user4, user5])
             $0.nodes(UserEqualId.self).sink {
                 XCTAssertEqual(4, $0.count)
