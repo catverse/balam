@@ -75,31 +75,3 @@ import Balam
         waitForExpectations(timeout: 1)
     }
 }
-
-private struct User: Codable {
-    var name = "lorem"
-    var age = 99
-}
-
-private struct UserId: Codable, Identifiable {
-    var id = 0
-    var name = "ipsum"
-}
-
-private struct UserEqual: Codable, Equatable {
-    var id = 1
-    var name = "hello"
-    
-    static func == (lhs: UserEqual, rhs: UserEqual) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-private struct UserEqualId: Codable, Equatable, Identifiable {
-    var id = 1
-    var name = "world"
-    
-    static func == (lhs: UserEqualId, rhs: UserEqualId) -> Bool {
-        lhs.name == rhs.name
-    }
-}

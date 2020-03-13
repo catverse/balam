@@ -1,16 +1,21 @@
 import XCTest
+import Combine
 @testable import Balam
 
 @available(OSX 10.15, *) final class GraphTests: XCTestCase {
     private var url: URL!
+    private var subs: Set<AnyCancellable>!
     
     override func setUp() {
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
+        subs = .init()
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
     override func tearDown() {
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
     func testDifferentClassesSameName() {
@@ -29,10 +34,15 @@ import XCTest
             let phone: Float
             let number: Int
         }
-        _ = graph._nodes(Model.self)
-        graph._add(Model(phone: 12.3, number: 4543))
-        let models = graph._nodes(Model.self)
-        XCTAssertEqual(1, models?.count)
+        let expect = expectation(description: "")
+        graph.nodes(Model.self).sink { _ in
+            graph.add(Model(phone: 12.3, number: 4543))
+            graph.nodes(Model.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
     
     private func addClassv2(_ graph: Graph) {
@@ -41,9 +51,14 @@ import XCTest
             let b: String
             let c: String
         }
-        _ = graph._nodes(Model.self)
-        graph._add(Model(a: "as", b: "bs", c: "cs"))
-        let models = graph._nodes(Model.self)
-        XCTAssertEqual(1, models?.count)
+        let expect = expectation(description: "")
+        graph.nodes(Model.self).sink { _ in
+            graph.add(Model(a: "as", b: "bs", c: "cs"))
+            graph.nodes(Model.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
 }

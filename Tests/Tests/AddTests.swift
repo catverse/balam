@@ -1,28 +1,53 @@
 import XCTest
+import Combine
 @testable import Balam
 
 @available(OSX 10.15, *) final class AddTests: XCTestCase {
     private var url: URL!
+    private var subs: Set<AnyCancellable>!
     
     override func setUp() {
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
+        subs = .init()
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
     override func tearDown() {
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
-    func testNode() {
-        let graph = Graph(url, queue: .main)
-        try! FileManager.default.removeItem(at: url)
-        graph._add(User())
-        XCTAssertEqual(1, graph.items.count)
-        XCTAssertEqual("User", graph.items.first?.name)
-        XCTAssertEqual(1, graph.items.first?.items.count)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    func testAdd() {
+        let expect = expectation(description: "")
+        Balam.graph(url).sink { graph in
+            try! FileManager.default.removeItem(at: self.url)
+            graph.add(User())
+            graph.nodes(User.self).sink {
+                XCTAssertEqual(1, graph.items.count)
+                XCTAssertEqual("User", graph.items.first?.name)
+                XCTAssertEqual(1, $0.count)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
     
+    func testDuplicate() {
+        let expect = expectation(description: "")
+        Balam.graph(url).sink {
+            $0.add(User())
+            $0.add(User())
+            $0.nodes(User.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    /*
     func testAddAndRetrieve() {
         let graph = Graph(url, queue: .main)
         graph._add(User())
@@ -92,25 +117,5 @@ import XCTest
             XCTAssertEqual("User", $0.name)
             XCTAssertEqual(3, $0.items.count)
         }
-    }
-}
-
-private struct User: Codable {
-    var name = "Lorem Ipsum"
-    var age = 99
-}
-
-private struct UserWithId: Codable, Identifiable {
-    var id = 0
-    var name = "Some name"
-    var age = 123
-}
-
-private struct UserEqual: Codable, Equatable {
-    var id = 1
-    var name = "hello"
-    
-    static func == (lhs: UserEqual, rhs: UserEqual) -> Bool {
-        lhs.id == rhs.id
-    }
+    }*/
 }

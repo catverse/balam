@@ -52,7 +52,7 @@ import Balam
         waitForExpectations(timeout: 1)
     }
     
-    func testEqualsDuplicates() {
+    func testEqualDuplicates() {
         let expect = expectation(description: "")
         var user1 = UserEqual()
         user1.id = 1
@@ -74,7 +74,7 @@ import Balam
         waitForExpectations(timeout: 1)
     }
     
-    func testEqualsAndId() {
+    func testEqualAndId() {
         let expect = expectation(description: "")
         var user1 = UserEqualId()
         user1.id = 1
@@ -103,34 +103,5 @@ import Balam
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
-    }
-}
-
-private struct User: Codable {
-    var name = "lorem"
-    var age = 99
-}
-
-private struct UserId: Codable, Identifiable {
-    var id = 0
-    var name = "ipsum"
-}
-
-private struct UserEqual: Codable, Equatable {
-    var id = 1
-    var name = "hello"
-    
-    static func == (lhs: UserEqual, rhs: UserEqual) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
-private struct UserEqualId: Codable, Equatable, Identifiable {
-    var id = 1
-    var name = "world"
-    var last = ""
-    
-    static func == (lhs: UserEqualId, rhs: UserEqualId) -> Bool {
-        lhs.name == rhs.name
     }
 }

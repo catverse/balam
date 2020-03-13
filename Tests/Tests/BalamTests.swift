@@ -34,7 +34,7 @@ import Combine
         Balam.graph(url).sink {
             var user = User()
             user.name = "lorem"
-            $0._add(user)
+            $0.add(user)
             Balam.graph(self.url).sink {
                 XCTAssertNotNil($0._nodes(User.self)?.first { $0.name == "lorem" })
                 expect.fulfill()
@@ -60,7 +60,7 @@ import Combine
         Balam.graph(url).sink {
             var user = User()
             user.name = "lorem"
-            $0._add(user)
+            $0.add(user)
             Balam.nodes(self.url).sink {
                 XCTAssertEqual(1, $0.count)
                 XCTAssertEqual(1, $0.first?.properties.count)

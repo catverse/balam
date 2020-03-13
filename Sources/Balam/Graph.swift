@@ -20,7 +20,10 @@ import Combine
     }
     
     public func add<T>(_ node: T) where T : Codable {
-        queue.async { self._add(node) }
+        queue.async {
+            self.items.add(node) { _ in true }
+            self.save()
+        }
     }
     
     public func add<T>(_ node: T) where T : Codable & Equatable {
@@ -30,7 +33,7 @@ import Combine
     }
     
     public func add<T>(_ node: T) where T : Codable & Identifiable {
-        queue.async { self._add(node) }
+
     }
     
     public func add<T>(_ node: T) where T : Codable & Equatable & Identifiable {
@@ -40,7 +43,7 @@ import Combine
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable {
-        queue.async { self._add(nodes) }
+
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable {
@@ -77,69 +80,6 @@ import Combine
                 promise(.success(self._nodes(type) ?? []))
             }
         }
-    }
-    
-    func _add<T>(_ node: T) where T : Codable {
-//        var container = find(.init(node))
-//        insert(node, container: &container)
-        save()
-    }
-    
-    func _add<T>(_ node: T) where T : Codable & Equatable {
-//        var container = find(.init(node))
-//        if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0) == node } {
-//            insert(node, container: &container)
-//            save()
-//        } else {
-//            nodes.insert(container)
-//        }
-    }
-    
-    func _add<T>(_ node: T) where T : Codable & Identifiable {
-//        var container = find(.init(node))
-//        if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0).id == node.id } {
-//            insert(node, container: &container)
-//            save()
-//        } else {
-//            nodes.insert(container)
-//        }
-    }
-    
-    func _add<T>(_ nodes: [T]) where T : Codable {
-//        nodes.first.map {
-//            var container = find(.init($0))
-//            nodes.forEach {
-//                try! container.items.insert(JSONEncoder().encode($0))
-//            }
-//            self.nodes.insert(container)
-//            save()
-//        }
-    }
-    
-    func _add<T>(_ nodes: [T]) where T : Codable & Equatable {
-//        nodes.first.map {
-//            var container = find(.init($0))
-//            nodes.forEach { node in
-//                if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0) == node } {
-//                    try! container.items.insert(JSONEncoder().encode(node))
-//                }
-//            }
-//            self.nodes.insert(container)
-//            save()
-//        }
-    }
-    
-    func _add<T>(_ nodes: [T]) where T : Codable & Identifiable {
-//        nodes.first.map {
-//            var container = find(.init($0))
-//            nodes.forEach { node in
-//                if !container.items.contains { try! JSONDecoder().decode(T.self, from: $0).id == node.id } {
-//                    try! container.items.insert(JSONEncoder().encode(node))
-//                }
-//            }
-//            self.nodes.insert(container)
-//            save()
-//        }
     }
     
     func _update<T>(_ node: T) where T : Codable, T : Identifiable {

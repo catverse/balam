@@ -8,7 +8,7 @@ import XCTest
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
         try? FileManager.default.removeItem(at: url)
     }
-    
+    /*
     override func tearDown() {
         try? FileManager.default.removeItem(at: url)
     }
@@ -26,7 +26,7 @@ import XCTest
         XCTAssertEqual("hello world", users?.first?.name)
         XCTAssertEqual(456, users?.first?.age)
         XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
-    }
+    }*/
 }
 
 private struct UserWithId: Codable, Identifiable {
