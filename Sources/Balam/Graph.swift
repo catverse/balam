@@ -21,7 +21,7 @@ import Combine
     
     public func add<T>(_ node: T) where T : Codable {
         queue.async {
-            self.items.add(node) { _ in true }
+            self.items.add(node)
             self.save()
         }
     }
@@ -31,6 +31,11 @@ import Combine
             self.items.add(node) { node == $0 }
         }
     }
+    
+    
+    
+    
+    
     
     public func add<T>(_ node: T) where T : Codable & Identifiable {
 

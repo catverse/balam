@@ -47,16 +47,37 @@ import Combine
         waitForExpectations(timeout: 1)
     }
     
-    /*
-    func testAddAndRetrieve() {
-        let graph = Graph(url, queue: .main)
-        graph._add(User())
-        let users = graph._nodes(User.self)
-        XCTAssertEqual(1, users?.count)
-        XCTAssertEqual("Lorem Ipsum", users?.first?.name)
-        XCTAssertEqual(99, users?.first?.age)
+    func testDifference() {
+        let expect = expectation(description: "")
+        var user = User()
+        Balam.graph(url).sink {
+            $0.add(user)
+            user.name = "sue"
+            $0.add(user)
+            $0.nodes(User.self).sink {
+                XCTAssertEqual(2, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
     
+    func testEquatable() {
+        let expect = expectation(description: "")
+        var user = UserEqual()
+        Balam.graph(url).sink {
+            $0.add(user)
+            user.name = "sue"
+            $0.add(user)
+            $0.nodes(UserEqual.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    /*
     func testId() {
         let graph = Graph(url, queue: .main)
         try! FileManager.default.removeItem(at: url)

@@ -13,6 +13,12 @@ extension Set where Set.Element == Node {
         }
     }
     
+    mutating func add<T>(_ item: T) where T : Codable {
+        mutate(item) {
+            $0.append(item)
+        }
+    }
+    
     mutating func add<T>(_ item: T, excluding: (T) -> Bool) where T : Codable {
         mutate(item) {
             if !$0.contains(where: { excluding($0) }) {
