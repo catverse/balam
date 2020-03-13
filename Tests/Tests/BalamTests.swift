@@ -27,17 +27,19 @@ import Combine
     }
     
     func testLoad() {
-        struct User: Codable {
-            var name = ""
-        }
         let expect = expectation(description: "")
         Balam.graph(url).sink {
             var user = User()
             user.name = "lorem"
             $0.add(user)
-            Balam.graph(self.url).sink {
-                XCTAssertNotNil($0._nodes(User.self)?.first { $0.name == "lorem" })
-                expect.fulfill()
+            $0.nodes(User.self).sink { _ in
+                Balam.graph(self.url).sink {
+                    $0.nodes(User.self).sink {
+                        XCTAssertEqual(1, $0.count)
+                        XCTAssertNotNil($0.first { $0.name == "lorem" })
+                        expect.fulfill()
+                    }.store(in: &self.subs)
+                }.store(in: &self.subs)
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
@@ -53,19 +55,16 @@ import Combine
     }
     
     func testLoadNodes() {
-        struct User: Codable {
-            var name = ""
-        }
         let expect = expectation(description: "")
         Balam.graph(url).sink {
-            var user = User()
-            user.name = "lorem"
-            $0.add(user)
-            Balam.nodes(self.url).sink {
-                XCTAssertEqual(1, $0.count)
-                XCTAssertEqual(1, $0.first?.properties.count)
-                XCTAssertEqual("User", $0.first?.name)
-                expect.fulfill()
+            $0.add(User())
+            $0.nodes(User.self).sink { _ in
+                Balam.nodes(self.url).sink {
+                    XCTAssertEqual(1, $0.count)
+                    XCTAssertEqual(2, $0.first?.properties.count)
+                    XCTAssertEqual("User", $0.first?.name)
+                    expect.fulfill()
+                }.store(in: &self.subs)
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
