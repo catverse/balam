@@ -98,7 +98,35 @@ import Combine
     
     public func remove<T>(_ node: T) where T : Codable {
         queue.async {
-            self.items.remove(node)
+            self.items.delete(node)
+            self.save()
+        }
+    }
+    
+    public func remove<T>(_ node: T) where T : Codable & Equatable {
+        queue.async {
+            self.items.delete(node) { node == $0 }
+            self.save()
+        }
+    }
+    
+    public func remove<T>(_ node: T) where T : Codable & Identifiable {
+        queue.async {
+            self.items.delete(node) { node.id == $0.id }
+            self.save()
+        }
+    }
+    
+    public func remove<T>(_ node: T) where T : Codable & Equatable & Identifiable {
+        queue.async {
+            self.items.delete(node) { node.id == $0.id && node == $0 }
+            self.save()
+        }
+    }
+    
+    public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
+        queue.async {
+            self.items.delete(type, when: when)
             self.save()
         }
     }
@@ -111,13 +139,6 @@ import Combine
     
     
     
-    public func remove<T>(_ node: T) where T : Codable, T : Identifiable {
-
-    }
-    
-    public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
-
-    }
     
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { promise in

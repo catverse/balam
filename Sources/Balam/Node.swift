@@ -36,4 +36,22 @@ public struct Node: Codable, Hashable {
     public static func == (lhs: Node, rhs: Node) -> Bool {
         lhs.name == rhs.name && lhs.properties == rhs.properties
     }
+    
+    static func == <T>(lhs: Node, rhs: T.Type) -> Bool where T : Codable {
+        lhs.name == .init(describing: rhs)
+            && lhs.items.first
+                .flatMap { try? JSONDecoder().decode(rhs, from: $0) }
+                .map { Node($0) == lhs }
+            ?? false
+    }
+    
+    mutating func mutate<T>(mutating: (inout [T]) -> Void) where T : Codable {
+        var decoded = items.map { try! JSONDecoder().decode(T.self, from: $0) }
+        mutating(&decoded)
+        items = .init(decoded.map { try! JSONEncoder().encode($0) })
+    }
+    
+    private func a<T>(_ type: T.Type) -> Bool where T : Codable {
+        self == type
+    }
 }

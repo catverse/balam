@@ -46,23 +46,29 @@ extension Set where Set.Element == Node {
         }
     }
     
-    mutating func remove<T>(_ item: T) where T : Codable {
+    mutating func delete<T>(_ item: T) where T : Codable {
         node(item) {
             try! $0.items.remove(JSONEncoder().encode(item))
         }
     }
     
-    mutating func remove<T>(_ item: T, when: (T) -> Bool) where T : Codable {
+    mutating func delete<T>(_ item: T, when: (T) -> Bool) where T : Codable {
         mutate(item) {
             $0.removeAll(where: when)
         }
     }
     
+    mutating func delete<T>(_ type: T.Type, when: (T) -> Bool) where T : Codable {
+        node(type) {
+            $0?.mutate {
+                $0.removeAll(where: when)
+            }
+        }
+    }
+    
     private mutating func mutate<T>(_ item: T, mutating: (inout [T]) -> Void) where T : Codable {
         node(item) {
-            var items = $0.items.map { try! JSONDecoder().decode(T.self, from: $0) }
-            mutating(&items)
-            $0.items = .init(items.map { try! JSONEncoder().encode($0) })
+            $0.mutate(mutating: mutating)
         }
     }
     
@@ -72,5 +78,11 @@ extension Set where Set.Element == Node {
             mutating(&node)
             insert(node)
         } (Node(item))
+    }
+    
+    private mutating func node<T>(_ type: T.Type, mutating: (inout Node?) -> Void) where T : Codable {
+        var node = firstIndex { $0 == type }.map { remove(at: $0) }
+        mutating(&node)
+        _ = node.map { insert($0) }
     }
 }
