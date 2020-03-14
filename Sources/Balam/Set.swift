@@ -1,18 +1,6 @@
 import Foundation
 
 extension Set where Set.Element == Node {
-    mutating func add<T>(_ items: [T], excluding: (T, T) -> Bool) where T : Codable {
-        items.first.map {
-            mutate($0) { nodes in
-                items.forEach { item in
-                    if !nodes.contains(where: { excluding(item, $0) }) {
-                        nodes.append(item)
-                    }
-                }
-            }
-        }
-    }
-    
     mutating func add<T>(_ item: T) where T : Codable {
         node(item) {
             try! $0.items.insert(JSONEncoder().encode(item))
@@ -23,6 +11,28 @@ extension Set where Set.Element == Node {
         mutate(item) {
             if !$0.contains(where: { excluding($0) }) {
                 $0.append(item)
+            }
+        }
+    }
+    
+    mutating func add<T>(_ items: [T]) where T : Codable {
+        items.first.map {
+            node($0) { mutating in
+                items.forEach {
+                    try! mutating.items.insert(JSONEncoder().encode($0))
+                }
+            }
+        }
+    }
+    
+    mutating func add<T>(_ items: [T], excluding: (T, T) -> Bool) where T : Codable {
+        items.first.map {
+            mutate($0) { nodes in
+                items.forEach { item in
+                    if !nodes.contains(where: { excluding(item, $0) }) {
+                        nodes.append(item)
+                    }
+                }
             }
         }
     }

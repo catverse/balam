@@ -33,40 +33,52 @@ import Combine
         }
     }
     
-    
-    
-    
-    
-    
     public func add<T>(_ node: T) where T : Codable & Identifiable {
-
+        queue.async {
+            self.items.add(node) { node.id == $0.id }
+            self.save()
+        }
     }
     
     public func add<T>(_ node: T) where T : Codable & Equatable & Identifiable {
         queue.async {
             self.items.add(node) { node.id == $0.id && node == $0 }
+            self.save()
         }
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable {
-
+        queue.async {
+            self.items.add(nodes)
+            self.save()
+        }
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable {
         queue.async {
             self.items.add(nodes) { $0 == $1 }
+            self.save()
         }
     }
-    
-    public func add<T>(_ nodes: [T]) where T : Codable & Identifiable {
 
+    public func add<T>(_ nodes: [T]) where T : Codable & Identifiable {
+        queue.async {
+            self.items.add(nodes) { $0.id == $1.id }
+            self.save()
+        }
     }
     
     public func add<T>(_ nodes: [T]) where T : Codable & Equatable & Identifiable {
         queue.async {
             self.items.add(nodes) { $0.id == $1.id && $0 == $1 }
+            self.save()
         }
     }
+    
+    
+    
+    
+    
     
     public func update<T>(_ node: T) where T : Codable, T : Identifiable {
         queue.async { self._update(node) }

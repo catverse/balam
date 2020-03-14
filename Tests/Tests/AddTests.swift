@@ -72,6 +72,7 @@ import Combine
             $0.add(user)
             $0.nodes(UserEqual.self).sink {
                 XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.name)
                 XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
                 expect.fulfill()
             }.store(in: &self.subs)
@@ -85,75 +86,33 @@ import Combine
         Balam.graph(url).sink {
             $0.add(user)
             user.name = "sue"
+            try! FileManager.default.removeItem(at: self.url)
             $0.add(user)
             $0.nodes(UserId.self).sink {
                 XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.name)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
                 expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
     
-    /*
-    func testId() {
-        let graph = Graph(url, queue: .main)
-        try! FileManager.default.removeItem(at: url)
-        graph._add(UserWithId())
-        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    func testEqualtableAndId() {
+        let expect = expectation(description: "")
+        var user = UserEqualId()
+        Balam.graph(url).sink {
+            $0.add(user)
+            user.last = "sue"
+            try! FileManager.default.removeItem(at: self.url)
+            $0.add(user)
+            $0.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.last)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
-    
-    func testEquatable() {
-        let graph = Graph(url, queue: .main)
-        try! FileManager.default.removeItem(at: url)
-        graph._add(UserEqual())
-        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
-    }
-    
-    func testDuplicate() {
-        let graph = Graph(url, queue: .main)
-        let user = User()
-        graph._add(user)
-        graph._add(user)
-        XCTAssertEqual(1, graph._nodes(User.self)?.count)
-    }
-    
-    func testEquatableDuplicates() {
-        let graph = Graph(url, queue: .main)
-        var user = UserEqual()
-        graph._add(user)
-        graph._add(user)
-        XCTAssertEqual(1, graph.items.first?.items.count)
-        user.name = "lorem"
-        graph._add(user)
-        XCTAssertEqual(1, graph.items.first?.items.count)
-        XCTAssertEqual("hello", graph._nodes(UserEqual.self)?.first?.name)
-    }
-    
-    func testIdDuplicate() {
-        let graph = Graph(url, queue: .main)
-        var user = UserWithId()
-        graph._add(user)
-        user.name = "john test"
-        graph._add(user)
-        XCTAssertEqual(1, graph.items.first?.items.count)
-        XCTAssertEqual("Some name", graph._nodes(UserWithId.self)?.first?.name)
-    }
-    
-    func testThreeNodes() {
-        let graph = Graph(url, queue: .main)
-        var first = User()
-        first.name = "some name"
-        first.age = 22
-        var last = User()
-        last.name = "Ipsum Lorem"
-        last.age = 33
-        graph._add(first)
-        graph._add(User())
-        graph._add(last)
-        XCTAssertEqual(1, graph.items.count)
-        graph.items.forEach {
-            XCTAssertEqual("User", $0.name)
-            XCTAssertEqual(3, $0.items.count)
-        }
-    }*/
 }
