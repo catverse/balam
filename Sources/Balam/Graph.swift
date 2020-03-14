@@ -29,6 +29,7 @@ import Combine
     public func add<T>(_ node: T) where T : Codable & Equatable {
         queue.async {
             self.items.add(node) { node == $0 }
+            self.save()
         }
     }
     

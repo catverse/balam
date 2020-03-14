@@ -14,8 +14,8 @@ extension Set where Set.Element == Node {
     }
     
     mutating func add<T>(_ item: T) where T : Codable {
-        mutate(item) {
-            $0.append(item)
+        node(item) {
+            try! $0.items.insert(JSONEncoder().encode(item))
         }
     }
     
@@ -28,11 +28,17 @@ extension Set where Set.Element == Node {
     }
     
     private mutating func mutate<T>(_ item: T, mutating: (inout [T]) -> Void) where T : Codable {
+        node(item) {
+            var items = $0.items.map { try! JSONDecoder().decode(T.self, from: $0) }
+            mutating(&items)
+            $0.items = .init(items.map { try! JSONEncoder().encode($0) })
+        }
+    }
+    
+    private mutating func node<T>(_ item: T, mutating: (inout Node) -> Void) where T : Codable {
         {
             var node = remove($0) ?? $0
-            var items = node.items.map { try! JSONDecoder().decode(T.self, from: $0) }
-            mutating(&items)
-            node.items = .init(items.map { try! JSONEncoder().encode($0) })
+            mutating(&node)
             insert(node)
         } (Node(item))
     }
