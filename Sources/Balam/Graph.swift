@@ -96,6 +96,13 @@ import Combine
         }
     }
     
+    public func remove<T>(_ node: T) where T : Codable {
+        queue.async {
+            self.items.remove(node)
+            self.save()
+        }
+    }
+    
     
     
     
@@ -105,11 +112,11 @@ import Combine
     
     
     public func remove<T>(_ node: T) where T : Codable, T : Identifiable {
-//        queue.async { self._remove(node) }
+
     }
     
     public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
-//        queue.async { self._remove(type, when: when) }
+
     }
     
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
