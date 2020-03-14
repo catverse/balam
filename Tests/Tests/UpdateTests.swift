@@ -75,16 +75,21 @@ import Combine
             user.last = "sue"
             graph.update(user)
             graph.nodes(UserEqualId.self).sink {
-                XCTAssertEqual(1, $0.count)
                 XCTAssertEqual("", $0.first?.last)
+                user.id = 2
                 user.name = ""
-                try! FileManager.default.removeItem(at: self.url)
                 graph.update(user)
                 graph.nodes(UserEqualId.self).sink {
-                    XCTAssertEqual(1, $0.count)
-                    XCTAssertEqual("sue", $0.first?.last)
-                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-                    expect.fulfill()
+                    XCTAssertEqual("", $0.first?.last)
+                    user.id = 1
+                    try! FileManager.default.removeItem(at: self.url)
+                    graph.update(user)
+                    graph.nodes(UserEqualId.self).sink {
+                        XCTAssertEqual(1, $0.count)
+                        XCTAssertEqual("sue", $0.first?.last)
+                        XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                        expect.fulfill()
+                    }.store(in: &self.subs)
                 }.store(in: &self.subs)
             }.store(in: &self.subs)
         }.store(in: &subs)

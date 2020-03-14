@@ -114,4 +114,34 @@ import Combine
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testDifferentEquatable() {
+        let expect = expectation(description: "")
+        let userA = UserEqualId()
+        var userB = UserEqualId()
+        userB.name = "sue"
+        Balam.graph(url).sink {
+            $0.add([userA, userB])
+            $0.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(2, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testDifferentId() {
+        let expect = expectation(description: "")
+        let userA = UserEqualId()
+        var userB = UserEqualId()
+        userB.id = 2
+        Balam.graph(url).sink {
+            $0.add([userA, userB])
+            $0.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(2, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
 }

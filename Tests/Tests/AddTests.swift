@@ -98,7 +98,7 @@ import Combine
         waitForExpectations(timeout: 1)
     }
     
-    func testEqualtableAndId() {
+    func testEquatableAndId() {
         let expect = expectation(description: "")
         var user = UserEqualId()
         Balam.graph(url).sink {
@@ -110,6 +110,36 @@ import Combine
                 XCTAssertEqual(1, $0.count)
                 XCTAssertEqual("", $0.first?.last)
                 XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testDifferentEquatable() {
+        let expect = expectation(description: "")
+        var user = UserEqualId()
+        Balam.graph(url).sink {
+            $0.add(user)
+            user.name = "sue"
+            $0.add(user)
+            $0.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(2, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testDifferentId() {
+        let expect = expectation(description: "")
+        var user = UserEqualId()
+        Balam.graph(url).sink {
+            $0.add(user)
+            user.id = 2
+            $0.add(user)
+            $0.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(2, $0.count)
                 expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
