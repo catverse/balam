@@ -75,21 +75,41 @@ import Combine
         }
     }
     
-    
-    
-    
-    
-    
-    public func update<T>(_ node: T) where T : Codable, T : Identifiable {
-        queue.async { self._update(node) }
+    public func update<T>(_ node: T) where T : Codable & Equatable {
+        queue.async {
+            self.items.update(node) { node == $0 }
+            self.save()
+        }
     }
     
+    public func update<T>(_ node: T) where T : Codable & Identifiable {
+        queue.async {
+            self.items.update(node) { node.id == $0.id }
+            self.save()
+        }
+    }
+    
+    public func update<T>(_ node: T) where T : Codable & Equatable & Identifiable {
+        queue.async {
+            self.items.update(node) { node.id == $0.id && node == $0 }
+            self.save()
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public func remove<T>(_ node: T) where T : Codable, T : Identifiable {
-        queue.async { self._remove(node) }
+//        queue.async { self._remove(node) }
     }
     
     public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
-        queue.async { self._remove(type, when: when) }
+//        queue.async { self._remove(type, when: when) }
     }
     
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {

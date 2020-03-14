@@ -9,7 +9,7 @@ extension Set where Set.Element == Node {
     
     mutating func add<T>(_ item: T, excluding: (T) -> Bool) where T : Codable {
         mutate(item) {
-            if !$0.contains(where: { excluding($0) }) {
+            if !$0.contains(where: excluding) {
                 $0.append(item)
             }
         }
@@ -27,12 +27,21 @@ extension Set where Set.Element == Node {
     
     mutating func add<T>(_ items: [T], excluding: (T, T) -> Bool) where T : Codable {
         items.first.map {
-            mutate($0) { nodes in
+            mutate($0) { mutating in
                 items.forEach { item in
-                    if !nodes.contains(where: { excluding(item, $0) }) {
-                        nodes.append(item)
+                    if !mutating.contains(where: { excluding(item, $0) }) {
+                        mutating.append(item)
                     }
                 }
+            }
+        }
+    }
+    
+    mutating func update<T>(_ item: T, when: (T) -> Bool) where T : Codable {
+        mutate(item) { mutating in
+            mutating.firstIndex(where: when).map {
+                mutating.remove(at: $0)
+                mutating.append(item)
             }
         }
     }
