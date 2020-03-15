@@ -63,7 +63,7 @@ extension Mirror {
     }
     
     private func isEmpty(_ value: Any) -> Bool {
-        value is [Any] ? (value as! [Any]).first.map { isNil($0) } ?? true : false
+        value is [Any] ? (value as! [Any]).first.map(isNil) ?? true : false
     }
     
     private func isNil(_ value: Any) -> Bool {

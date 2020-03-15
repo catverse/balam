@@ -48,7 +48,15 @@ public struct Node: Codable, Hashable {
     mutating func mutate<T>(mutating: (inout [T]) -> Void) where T : Codable {
         var decoded: [T] = decoding()
         mutating(&decoded)
-        items = .init(decoded.map { try! JSONEncoder().encode($0) })
+        items = try! .init(decoded.map(JSONEncoder().encode))
+    }
+    
+    mutating func mutate<T>(mutating: (inout T) -> Void) where T : Codable {
+        items = try! .init(decoding().map { (item: T) -> T in
+            var item = item
+            mutating(&item)
+            return item
+        }.map(JSONEncoder().encode))
     }
     
     func decoding<T>() -> [T] where T : Codable {

@@ -96,6 +96,13 @@ import Combine
         }
     }
     
+    public func update<T>(_ type: T.Type, with: @escaping (inout T) -> Void) where T : Codable {
+        queue.async {
+            self.items.update(type, with: with)
+            self.save()
+        }
+    }
+    
     public func remove<T>(_ node: T) where T : Codable {
         queue.async {
             self.items.delete(node)
@@ -126,7 +133,7 @@ import Combine
     
     public func remove<T>(_ type: T.Type, when: @escaping (T) -> Bool) where T : Codable {
         queue.async {
-            self.items.delete(type, when: when)
+            self.items.delete(when)
             self.save()
         }
     }

@@ -99,4 +99,19 @@ import Combine
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testWith() {
+        let expect = expectation(description: "")
+        Balam.graph(url).sink {
+            $0.add([User(), User()])
+            $0.update(User.self) {
+                $0.name = "updated"
+            }
+            $0.nodes(User.self).sink {
+                XCTAssertNil($0.first { $0.name != "updated" })
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
 }

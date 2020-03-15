@@ -46,6 +46,12 @@ extension Set where Set.Element == Node {
         }
     }
     
+    mutating func update<T>(_ type: T.Type, with: (inout T) -> Void) where T : Codable {
+        node(type) {
+            $0?.mutate(mutating: with)
+        }
+    }
+    
     mutating func delete<T>(_ item: T) where T : Codable {
         node(item) {
             try! $0.items.remove(JSONEncoder().encode(item))
@@ -58,8 +64,8 @@ extension Set where Set.Element == Node {
         }
     }
     
-    mutating func delete<T>(_ type: T.Type, when: (T) -> Bool) where T : Codable {
-        node(type) {
+    mutating func delete<T>(_ when: (T) -> Bool) where T : Codable {
+        node(T.self) {
             $0?.mutate {
                 $0.removeAll(where: when)
             }
