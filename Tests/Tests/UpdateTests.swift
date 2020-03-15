@@ -102,14 +102,18 @@ import Combine
     
     func testWith() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink {
-            $0.add([User(), User()])
-            $0.update(User.self) {
-                $0.name = "updated"
-            }
-            $0.nodes(User.self).sink {
-                XCTAssertNil($0.first { $0.name != "updated" })
-                expect.fulfill()
+        Balam.graph(url).sink { graph in
+            graph.add([User(), User()])
+            graph.nodes(User.self).sink { _ in
+                try! FileManager.default.removeItem(at: self.url)
+                graph.update(User.self) {
+                    $0.name = "updated"
+                }
+                graph.nodes(User.self).sink {
+                    XCTAssertNil($0.first { $0.name != "updated" })
+                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                    expect.fulfill()
+                }.store(in: &self.subs)
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
