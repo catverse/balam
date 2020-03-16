@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *) public final class Graph {
+@available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Graph {
     private(set) var items = Set<Node>()
     private let url: URL
     private let queue: DispatchQueue

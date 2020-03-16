@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *) public final class Balam {
+@available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Balam {
     public class func graph(_ name: String) -> Future<Graph, Never> {
         graph(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(name + ".balam"))
     }
