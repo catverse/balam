@@ -22,14 +22,16 @@ import Combine
     
     func testAdd() {
         let expect = expectation(description: "")
-        try! FileManager.default.removeItem(at: url)
-        balam.add([User()])
-        balam.nodes(User.self).sink {
-            XCTAssertEqual(1, self.balam.items.count)
-            XCTAssertEqual("User", self.balam.items.first?.name)
-            XCTAssertEqual(1, $0.count)
-            XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-            expect.fulfill()
+        balam.nodes(User.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.add([User()])
+            self.balam.nodes(User.self).sink {
+                XCTAssertEqual(1, self.balam.items.count)
+                XCTAssertEqual("User", self.balam.items.first?.name)
+                XCTAssertEqual(1, $0.count)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
@@ -62,13 +64,15 @@ import Combine
         let userA = UserEqual()
         var userB = UserEqual()
         userB.name = "sue"
-        try! FileManager.default.removeItem(at: url)
-        balam.add([userA, userB])
-        balam.nodes(UserEqual.self).sink {
-            XCTAssertEqual(1, $0.count)
-            XCTAssertEqual("", $0.first?.name)
-            XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-            expect.fulfill()
+        balam.nodes(UserEqual.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.add([userA, userB])
+            self.balam.nodes(UserEqual.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.name)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
@@ -78,13 +82,15 @@ import Combine
         let userA = UserId()
         var userB = UserId()
         userB.name = "sue"
-        try! FileManager.default.removeItem(at: url)
-        balam.add([userA, userB])
-        balam.nodes(UserId.self).sink {
-            XCTAssertEqual(1, $0.count)
-            XCTAssertEqual("", $0.first?.name)
-            XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-            expect.fulfill()
+        balam.nodes(UserId.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.add([userA, userB])
+            self.balam.nodes(UserId.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.name)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
@@ -94,13 +100,15 @@ import Combine
         let userA = UserEqualId()
         var userB = UserEqualId()
         userB.last = "sue"
-        try! FileManager.default.removeItem(at: url)
-        balam.add([userA, userB])
-        balam.nodes(UserEqualId.self).sink {
-            XCTAssertEqual(1, $0.count)
-            XCTAssertEqual("", $0.first?.last)
-            XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-            expect.fulfill()
+        balam.nodes(UserEqualId.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.add([userA, userB])
+            self.balam.nodes(UserEqualId.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("", $0.first?.last)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }

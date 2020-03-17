@@ -5,12 +5,14 @@ import Combine
 @available(OSX 10.15, *) final class UpdateTests: XCTestCase {
     private var url: URL!
     private var subs: Set<AnyCancellable>!
+    private var balam: Balam!
     
     override func setUp() {
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
         subs = .init()
         try? FileManager.default.removeItem(at: url)
         try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
+        balam = .init(url)
     }
     
     override func tearDown() {
@@ -20,12 +22,10 @@ import Combine
     
     func testNonExisiting() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink {
-            $0.update(UserEqual())
-            $0.nodes(UserEqual.self).sink {
-                XCTAssertTrue($0.isEmpty)
-                expect.fulfill()
-            }.store(in: &self.subs)
+        balam.update(UserEqual())
+        balam.nodes(UserEqual.self).sink {
+            XCTAssertTrue($0.isEmpty)
+            expect.fulfill()
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
@@ -33,18 +33,16 @@ import Combine
     func testEquatable() {
         let expect = expectation(description: "")
         var user = UserEqual()
-        Balam.graph(url).sink { graph in
-            graph.add(user)
-            graph.nodes(UserEqual.self).sink { _ in
-                user.name = "sue"
-                try! FileManager.default.removeItem(at: self.url)
-                graph.update(user)
-                graph.nodes(UserEqual.self).sink {
-                    XCTAssertEqual(1, $0.count)
-                    XCTAssertEqual("sue", $0.first?.name)
-                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-                    expect.fulfill()
-                }.store(in: &self.subs)
+        balam.add(user)
+        balam.nodes(UserEqual.self).sink { _ in
+            user.name = "sue"
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.update(user)
+            self.balam.nodes(UserEqual.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("sue", $0.first?.name)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
@@ -53,18 +51,16 @@ import Combine
     func testId() {
         let expect = expectation(description: "")
         var user = UserId()
-        Balam.graph(url).sink { graph in
-            graph.add(user)
-            graph.nodes(UserId.self).sink { _ in
-                user.name = "sue"
-                try! FileManager.default.removeItem(at: self.url)
-                graph.update(user)
-                graph.nodes(UserId.self).sink {
-                    XCTAssertEqual(1, $0.count)
-                    XCTAssertEqual("sue", $0.first?.name)
-                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-                    expect.fulfill()
-                }.store(in: &self.subs)
+        balam.add(user)
+        balam.nodes(UserId.self).sink { _ in
+            user.name = "sue"
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.update(user)
+            self.balam.nodes(UserId.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual("sue", $0.first?.name)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
@@ -73,27 +69,25 @@ import Combine
     func testEqualtableAndId() {
         let expect = expectation(description: "")
         var user = UserEqualId()
-        Balam.graph(url).sink { graph in
-            graph.add(user)
-            user.name = "some"
-            user.last = "sue"
-            graph.update(user)
-            graph.nodes(UserEqualId.self).sink {
+        balam.add(user)
+        user.name = "some"
+        user.last = "sue"
+        balam.update(user)
+        balam.nodes(UserEqualId.self).sink {
+            XCTAssertEqual("", $0.first?.last)
+            user.id = 2
+            user.name = ""
+            self.balam.update(user)
+            self.balam.nodes(UserEqualId.self).sink {
                 XCTAssertEqual("", $0.first?.last)
-                user.id = 2
-                user.name = ""
-                graph.update(user)
-                graph.nodes(UserEqualId.self).sink {
-                    XCTAssertEqual("", $0.first?.last)
-                    user.id = 1
-                    try! FileManager.default.removeItem(at: self.url)
-                    graph.update(user)
-                    graph.nodes(UserEqualId.self).sink {
-                        XCTAssertEqual(1, $0.count)
-                        XCTAssertEqual("sue", $0.first?.last)
-                        XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-                        expect.fulfill()
-                    }.store(in: &self.subs)
+                user.id = 1
+                try! FileManager.default.removeItem(at: self.url)
+                self.balam.update(user)
+                self.balam.nodes(UserEqualId.self).sink {
+                    XCTAssertEqual(1, $0.count)
+                    XCTAssertEqual("sue", $0.first?.last)
+                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                    expect.fulfill()
                 }.store(in: &self.subs)
             }.store(in: &self.subs)
         }.store(in: &subs)
@@ -102,18 +96,16 @@ import Combine
     
     func testWith() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink { graph in
-            graph.add([User(), User()])
-            graph.nodes(User.self).sink { _ in
-                try! FileManager.default.removeItem(at: self.url)
-                graph.update(User.self) {
-                    $0.name = "updated"
-                }
-                graph.nodes(User.self).sink {
-                    XCTAssertNil($0.first { $0.name != "updated" })
-                    XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-                    expect.fulfill()
-                }.store(in: &self.subs)
+        balam.add([User(), User()])
+        balam.nodes(User.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.update(User.self) {
+                $0.name = "updated"
+            }
+            self.balam.nodes(User.self).sink {
+                XCTAssertNil($0.first { $0.name != "updated" })
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)

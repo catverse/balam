@@ -22,14 +22,16 @@ import Combine
     
     func testAdd() {
         let expect = expectation(description: "")
-        try! FileManager.default.removeItem(at: url)
-        balam.add(User())
-        balam.nodes(User.self).sink {
-            XCTAssertEqual(1, self.balam.items.count)
-            XCTAssertEqual("User", self.balam.items.first?.name)
-            XCTAssertEqual(1, $0.count)
-            XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
-            expect.fulfill()
+        balam.nodes(User.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.add(User())
+            self.balam.nodes(User.self).sink {
+                XCTAssertEqual(1, self.balam.items.count)
+                XCTAssertEqual("User", self.balam.items.first?.name)
+                XCTAssertEqual(1, $0.count)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }

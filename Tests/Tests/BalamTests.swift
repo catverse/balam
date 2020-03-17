@@ -10,6 +10,7 @@ import Combine
         subs = .init()
         url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("test")
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam"))
     }
     
     override func tearDown() {
@@ -19,7 +20,7 @@ import Combine
     
     func testCreate() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink { _ in
+        Balam(url).describe().sink { _ in
             XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
             expect.fulfill()
         }.store(in: &subs)
@@ -28,18 +29,16 @@ import Combine
     
     func testLoad() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink {
-            var user = User()
-            user.name = "lorem"
-            $0.add(user)
-            $0.nodes(User.self).sink { _ in
-                Balam.graph(self.url).sink {
-                    $0.nodes(User.self).sink {
-                        XCTAssertEqual(1, $0.count)
-                        XCTAssertNotNil($0.first { $0.name == "lorem" })
-                        expect.fulfill()
-                    }.store(in: &self.subs)
-                }.store(in: &self.subs)
+        let balam = Balam(url)
+        var user = User()
+        user.name = "lorem"
+        balam.add(user)
+        balam.nodes(User.self).sink { _ in
+            let other = Balam(self.url)
+            other.nodes(User.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertNotNil($0.first { $0.name == "lorem" })
+                expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
@@ -47,7 +46,7 @@ import Combine
     
     func testUsingNameOnly() {
         let expect = expectation(description: "")
-        Balam.graph("test").sink { _ in
+        Balam("test").describe().sink { _ in
             XCTAssertTrue(FileManager.default.fileExists(atPath: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam").path))
             expect.fulfill()
         }.store(in: &subs)
@@ -56,15 +55,58 @@ import Combine
     
     func testLoadNodes() {
         let expect = expectation(description: "")
-        Balam.graph(url).sink {
-            $0.add(User())
-            $0.nodes(User.self).sink { _ in
-                Balam.nodes(self.url).sink {
-                    XCTAssertEqual(1, $0.count)
-                    XCTAssertEqual(2, $0.first?.properties.count)
-                    XCTAssertEqual("User", $0.first?.name)
-                    expect.fulfill()
-                }.store(in: &self.subs)
+        let balam = Balam(url)
+        balam.add(User())
+        balam.nodes(User.self).sink { _ in
+            Balam(self.url).describe().sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual(2, $0.first?.properties.count)
+                XCTAssertEqual("User", $0.first?.name)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testDifferentClassesSameName() {
+        let  balam = Balam(url)
+        addClassv1(balam)
+        addClassv2(balam)
+        XCTAssertEqual(2, balam.items.count)
+        balam.items.forEach {
+            XCTAssertEqual("Model", $0.name)
+            XCTAssertEqual(1, $0.items.count)
+        }
+    }
+    
+    private func addClassv1(_ balam: Balam) {
+        struct Model: Codable {
+            let phone: Float
+            let number: Int
+        }
+        let expect = expectation(description: "")
+        balam.nodes(Model.self).sink { _ in
+            balam.add(Model(phone: 12.3, number: 4543))
+            balam.nodes(Model.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    private func addClassv2(_ balam: Balam) {
+        struct Model: Codable {
+            let a: String
+            let b: String
+            let c: String
+        }
+        let expect = expectation(description: "")
+        balam.nodes(Model.self).sink { _ in
+            balam.add(Model(a: "as", b: "bs", c: "cs"))
+            balam.nodes(Model.self).sink {
+                XCTAssertEqual(1, $0.count)
+                expect.fulfill()
             }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)

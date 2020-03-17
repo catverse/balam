@@ -151,7 +151,7 @@ import Combine
         }
     }
     
-    public func nodes() -> Future<Set<Node>, Never> {
+    public func describe() -> Future<Set<Node>, Never> {
         .init { promise in
             self.queue.async {
                 promise(.success(self.items))
