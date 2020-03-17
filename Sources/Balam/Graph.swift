@@ -4,11 +4,14 @@ import Combine
 @available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Graph {
     private(set) var items = Set<Node>()
     private let url: URL
-    private let queue: DispatchQueue
+    private let queue = DispatchQueue(label: "", qos: .utility)
     
-    init(_ url: URL, queue: DispatchQueue) {
+    public convenience init(_ name: String) {
+        self.init(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(name + ".balam"))
+    }
+    
+    public init(_ url: URL) {
         self.url = url
-        self.queue = queue
         guard
             FileManager.default.fileExists(atPath: url.path),
             let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
@@ -142,6 +145,14 @@ import Combine
         .init { promise in
             self.queue.async {
                 promise(.success(self.items.first { $0 == type }?.decoding() ?? []))
+            }
+        }
+    }
+    
+    public func nodes() -> Future<Set<Node>, Never> {
+        .init { promise in
+            self.queue.async {
+                promise(.success(self.items))
             }
         }
     }
