@@ -19,7 +19,7 @@ import Combine
     }
     
     func testDifferentClassesSameName() {
-        let graph = Graph(url, queue: .main)
+        let graph = Balam(url, queue: .main)
         addClassv1(graph)
         addClassv2(graph)
         XCTAssertEqual(2, graph.items.count)
@@ -29,7 +29,7 @@ import Combine
         }
     }
     
-    private func addClassv1(_ graph: Graph) {
+    private func addClassv1(_ graph: Balam) {
         struct Model: Codable {
             let phone: Float
             let number: Int
@@ -45,7 +45,7 @@ import Combine
         waitForExpectations(timeout: 1)
     }
     
-    private func addClassv2(_ graph: Graph) {
+    private func addClassv2(_ graph: Balam) {
         struct Model: Codable {
             let a: String
             let b: String
