@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Graph {
+@available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Balam {
     private(set) var items = Set<Node>()
     private let url: URL
     private let queue = DispatchQueue(label: "", qos: .utility)
@@ -12,14 +12,16 @@ import Combine
     
     public init(_ url: URL) {
         self.url = url
-        guard
-            FileManager.default.fileExists(atPath: url.path),
-            let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
-        else {
-            save()
-            return
+        queue.async {
+            guard
+                FileManager.default.fileExists(atPath: url.path),
+                let nodes = try? JSONDecoder().decode(Set<Node>.self, from: (.init(contentsOf: url) as NSData).decompressed(using: .lzfse) as Data)
+            else {
+                self.save()
+                return
+            }
+            self.items = nodes
         }
-        self.items = nodes
     }
     
     public func add<T>(_ node: T) where T : Codable {
