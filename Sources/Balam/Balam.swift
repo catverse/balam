@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-@available(OSX 10.15, *, iOS 13.0, *, watchOS 6.0, *) public final class Balam {
+public final class Balam {
     private(set) var items = Set<Node>()
     private let url: URL
     private let queue = DispatchQueue(label: "", qos: .utility)
