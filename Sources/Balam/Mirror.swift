@@ -15,7 +15,7 @@ extension Mirror {
     
     private func guess<T>(_ property: String, object: T) -> Property where T : Codable {
         ["", 0, false].flatMap {
-            [$0, [$0], [[$0]], [[[$0]]], [[[[$0]]]]].compactMap {
+            [$0, [$0], [[$0]]].compactMap {
                 inject($0, property: property, object: object)
             }
         }.first.map { wrapped(property, value: $0) } ?? .Custom(property)
