@@ -5,7 +5,7 @@ Native database written in Swift for iOS, macOS and watchOS.
 <p align="center">
     <img src="https://img.shields.io/badge/swift-5.2-orange.svg" />
     <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
-     <img src="https://img.shields.io/badge/platforms-macOS+iOS+iPadOS+watchOS-brightgreen.svg?style=flat" alt="macOS + iOS + iPadOS + watchOS" />
+    <img src="https://img.shields.io/badge/platforms-macOS+iOS+iPadOS+watchOS-brightgreen.svg?style=flat" alt="macOS + iOS + iPadOS + watchOS" />
 </p>
 
 
