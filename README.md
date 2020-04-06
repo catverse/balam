@@ -1,11 +1,5 @@
-# Balam ![Swift](https://github.com/catverse/balam/workflows/Swift/badge.svg?branch=master&event=push)
+# Balam ![Swift](https://github.com/catverse/balam/workflows/Swift/badge.svg?branch=master&event=push) <img src="https://img.shields.io/badge/swift 5.2-SPM-orange.svg" />
 Native database written in Swift for iOS, macOS and watchOS.
-
-<p align="center">
-    <img src="https://img.shields.io/badge/swift-5.2-orange.svg" />
-    <img src="https://img.shields.io/badge/package-spm-orange.svg?style=flat" alt="Swift Package Manager" />
-</p>
-
 
 ## Features
 - NoSQL
