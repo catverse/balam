@@ -69,7 +69,7 @@ import Combine
     }
     
     func testDifferentClassesSameName() {
-        let  balam = Balam(url)
+        let balam = Balam(url)
         addClassv1(balam)
         addClassv2(balam)
         XCTAssertEqual(2, balam.items.count)
@@ -77,6 +77,32 @@ import Combine
             XCTAssertEqual("Model", $0.name)
             XCTAssertEqual(1, $0.items.count)
         }
+    }
+    
+    func testOptionalValues() {
+        let expect = expectation(description: "")
+        var user: UserId?
+        user = .init()
+        let balam = Balam(url)
+        balam.add(user)
+        balam.nodes(UserId.self).sink {
+            XCTAssertTrue($0.isEmpty)
+            expect.fulfill()
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+    
+    func testOptionalUnwrapped() {
+        let expect = expectation(description: "")
+        var user: UserId?
+        user = .init()
+        let balam = Balam(url)
+        balam.add(user!)
+        balam.nodes(UserId.self).sink {
+            XCTAssertEqual(1, $0.count)
+            expect.fulfill()
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
     }
     
     private func addClassv1(_ balam: Balam) {
