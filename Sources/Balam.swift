@@ -154,6 +154,17 @@ public final class Balam {
         }
     }
     
+    public func nodes<T>(_ type: T.Type, isIncluded: @escaping (T) -> Bool) -> Future<[T], Never> where T : Codable {
+        .init { promise in
+            self.queue.async {
+                let result = Result<[T], Never>.success(self.items.nodes(type, isIncluded: isIncluded))
+                DispatchQueue.main.async {
+                    promise(result)
+                }
+            }
+        }
+    }
+    
     public func describe() -> Future<Set<Node>, Never> {
         .init { promise in
             self.queue.async {

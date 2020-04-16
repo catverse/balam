@@ -72,6 +72,10 @@ extension Set where Set.Element == Node {
         }
     }
     
+    func nodes<T>(_ type: T.Type, isIncluded: (T) -> Bool) -> [T] where T : Codable {
+        first { $0 == type }?.decoding().filter(isIncluded) ?? []
+    }
+    
     private mutating func mutate<T>(_ item: T, mutating: (inout [T]) -> Void) where T : Codable {
         node(item) {
             $0.mutate(mutating: mutating)
