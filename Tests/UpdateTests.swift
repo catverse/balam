@@ -2,7 +2,7 @@ import XCTest
 import Combine
 @testable import Balam
 
-@available(OSX 10.15, *) final class UpdateTests: XCTestCase {
+final class UpdateTests: XCTestCase {
     private var url: URL!
     private var subs: Set<AnyCancellable>!
     private var balam: Balam!

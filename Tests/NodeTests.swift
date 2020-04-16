@@ -1,7 +1,7 @@
 import XCTest
 @testable import Balam
 
-@available(OSX 10.15, *) final class NodeTests: XCTestCase {
+final class NodeTests: XCTestCase {
     func testParse() {
         struct Model: Codable {
             var uint8 = UInt8()

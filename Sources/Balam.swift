@@ -146,7 +146,10 @@ public final class Balam {
     public func nodes<T>(_ type: T.Type) -> Future<[T], Never> where T : Codable {
         .init { promise in
             self.queue.async {
-                promise(.success(self.items.first { $0 == type }?.decoding() ?? []))
+                let result = Result<[T], Never>.success(self.items.first { $0 == type }?.decoding() ?? [])
+                DispatchQueue.main.async {
+                    promise(result)
+                }
             }
         }
     }
