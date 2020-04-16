@@ -157,7 +157,10 @@ public final class Balam {
     public func describe() -> Future<Set<Node>, Never> {
         .init { promise in
             self.queue.async {
-                promise(.success(self.items))
+                let result = Result<Set<Node>, Never>.success(self.items)
+                DispatchQueue.main.async {
+                    promise(result)
+                }
             }
         }
     }

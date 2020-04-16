@@ -47,6 +47,7 @@ final class BalamTests: XCTestCase {
     func testUsingNameOnly() {
         let expect = expectation(description: "")
         Balam("test").describe().sink { _ in
+            XCTAssertEqual(.main, Thread.current)
             XCTAssertTrue(FileManager.default.fileExists(atPath: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("test.balam").path))
             expect.fulfill()
         }.store(in: &subs)
