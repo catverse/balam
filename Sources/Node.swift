@@ -59,6 +59,10 @@ public struct Node: Codable, Hashable {
         }.map(JSONEncoder().encode))
     }
     
+    mutating func replace<T>(with: T) where T : Codable {
+        items = try! .init([with].map(JSONEncoder().encode))
+    }
+    
     func decoding<T>() -> [T] where T : Codable {
         items.map { try! JSONDecoder().decode(T.self, from: $0) }
     }

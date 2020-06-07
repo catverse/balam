@@ -108,6 +108,13 @@ public final class Balam {
         }
     }
     
+    public func replace<T>(_ type: T.Type, with: T) where T : Codable {
+        queue.async {
+            self.items.replace(type, with: with)
+            self.save()
+        }
+    }
+    
     public func remove<T>(_ node: T) where T : Codable {
         queue.async {
             self.items.delete(node)

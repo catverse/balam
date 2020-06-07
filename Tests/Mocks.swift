@@ -28,3 +28,10 @@ struct UserEqualId: Codable, Equatable, Identifiable {
         lhs.name == rhs.name
     }
 }
+
+enum Mode: String, Codable {
+    case
+    cool,
+    uncool,
+    meh
+}

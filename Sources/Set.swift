@@ -52,6 +52,12 @@ extension Set where Set.Element == Node {
         }
     }
     
+    mutating func replace<T>(_ type: T.Type, with: T) where T : Codable {
+        node(type) {
+            $0?.replace(with: with)
+        }
+    }
+    
     mutating func delete<T>(_ item: T) where T : Codable {
         node(item) {
             try! $0.items.remove(JSONEncoder().encode(item))
