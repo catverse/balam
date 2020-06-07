@@ -70,13 +70,17 @@ final class EnumTests: XCTestCase {
     func testReplace() {
         let expect = expectation(description: "")
         balam.add(Mode.uncool)
-        balam.replace(Mode.self, with: .cool)
-        balam.nodes(Mode.self).sink {
-            XCTAssertFalse($0.contains(.uncool))
-            XCTAssertFalse($0.contains(.meh))
-            XCTAssertTrue($0.contains(.cool))
-            XCTAssertEqual(1, $0.count)
-            expect.fulfill()
+        balam.nodes(Mode.self).sink { _ in
+            try! FileManager.default.removeItem(at: self.url)
+            self.balam.replace(Mode.self, with: .cool)
+            self.balam.nodes(Mode.self).sink {
+                XCTAssertFalse($0.contains(.uncool))
+                XCTAssertFalse($0.contains(.meh))
+                XCTAssertTrue($0.contains(.cool))
+                XCTAssertEqual(1, $0.count)
+                XCTAssertTrue(FileManager.default.fileExists(atPath: self.url.path))
+                expect.fulfill()
+            }.store(in: &self.subs)
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
