@@ -113,12 +113,12 @@ final class UpdateTests: XCTestCase {
     
     func testWithOptionals() {
         let expect = expectation(description: "")
-        balam.add(Some.Out())
-        balam.nodes(Some.Out.self).sink { _ in
-            var out = Some.Out()
+        balam.add(Out())
+        balam.nodes(Out.self).sink { _ in
+            var out = Out()
             out.items.append(.init(value: true))
             self.balam.update(out)
-            self.balam.nodes(Some.Out.self).sink {
+            self.balam.nodes(Out.self).sink {
                 XCTAssertEqual(1, $0.count)
                 XCTAssertEqual(1, $0.first?.items.count)
                 expect.fulfill()
@@ -128,18 +128,16 @@ final class UpdateTests: XCTestCase {
     }
 }
 
-private struct Some {
-    struct Out: Codable, Equatable {
-        struct In: Codable {
-            let value: Bool?
-        }
-        
-        var items = [In]()
-        
-        func hash(into: inout Hasher) { }
-        
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            true
-        }
+private struct Out: Codable, Equatable {
+    struct In: Codable {
+        let value: Bool?
+    }
+    
+    var items = [In]()
+    
+    func hash(into: inout Hasher) { }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        true
     }
 }
