@@ -110,4 +110,36 @@ final class UpdateTests: XCTestCase {
         }.store(in: &subs)
         waitForExpectations(timeout: 1)
     }
+    
+    func testWithOptionals() {
+        let expect = expectation(description: "")
+        balam.add(Some.Out())
+        balam.nodes(Some.Out.self).sink { _ in
+            var out = Some.Out()
+            out.items.append(.init(value: true))
+            self.balam.update(out)
+            self.balam.nodes(Some.Out.self).sink {
+                XCTAssertEqual(1, $0.count)
+                XCTAssertEqual(1, $0.first?.items.count)
+                expect.fulfill()
+            }.store(in: &self.subs)
+        }.store(in: &subs)
+        waitForExpectations(timeout: 1)
+    }
+}
+
+private struct Some {
+    struct Out: Codable, Equatable {
+        struct In: Codable {
+            let value: Bool?
+        }
+        
+        var items = [In]()
+        
+        func hash(into: inout Hasher) { }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            true
+        }
+    }
 }
