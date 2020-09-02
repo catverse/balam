@@ -18,7 +18,9 @@ extension Mirror {
             [$0, [$0], [[$0]]].compactMap {
                 inject($0, property: property, object: object)
             }
-        }.first.map { wrapped(property, value: $0) } ?? .Custom(property)
+        }.first.map { wrapped(property, value: $0) }
+        ?? emptyCustomArray(property, object: object)
+        ?? .Custom(property)
     }
     
     private func wrapped(_ name: String, value: Any) -> Property {
@@ -59,6 +61,17 @@ extension Mirror {
         json[property] = meta
         return (try? JSONDecoder().decode(T.self, from: JSONSerialization.data(withJSONObject: json))).map {
             Mirror(reflecting: $0).children.first { $0.label == property }!.value
+        }
+    }
+    
+    private func emptyCustomArray<T>(_ property: String, object: T) -> Property? where T : Codable {
+        var json = try! JSONSerialization.jsonObject(with: JSONEncoder().encode(object)) as! [String : Any]
+        json[property] = [Int]()
+        do {
+            _ = try JSONDecoder().decode(T.self, from: JSONSerialization.data(withJSONObject: json))
+            return .Array(.Custom(property))
+        } catch {
+            return nil
         }
     }
     
